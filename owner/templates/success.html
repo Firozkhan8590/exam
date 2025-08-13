@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Booking Confirmed | AeroTrack</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lottie for animation -->
+  <script src="https://unpkg.com/lottie-web@5.7.4/build/player/lottie.min.js"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+  <div class="bg-white max-w-2xl w-full rounded-3xl shadow-2xl p-8 text-center">
+
+    <!-- ✅ Animation -->
+    <div id="success-animation" class="w-28 h-28 mx-auto mb-4"></div>
+
+    <!-- 🌟 Title -->
+    <h1 class="text-3xl font-bold text-green-700 mb-2">Booking Confirmed!</h1>
+    <p class="text-gray-600 text-lg mb-6">You're all set for your stay. We look forward to welcoming you 🌿</p>
+
+    <!-- 🏨 Booking Details -->
+    <div class="bg-gray-50 rounded-xl p-6 text-left shadow-inner mb-6 space-y-3">
+      <div class="flex items-center justify-between">
+        <span class="text-gray-700 font-medium">Hotel</span>
+        <span class="font-semibold text-indigo-700">{{ room.hotel.hotel_name|title }}</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-gray-700 font-medium">Room Type</span>
+        <span class="text-gray-800">{{ room.room_type.name|title }}</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-gray-700 font-medium">Check-in</span>
+        <span class="text-gray-800">{{ booking.check_in }}</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-gray-700 font-medium">Check-out</span>
+        <span class="text-gray-800">{{ booking.check_out }}</span>
+      </div>
+      
+      <div class="flex items-center justify-between">
+        <span class="text-gray-700 font-medium">Total Paid</span>
+        <span class="text-green-600 font-bold text-lg">₹{{ booking.total_amount }}</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-gray-700 font-medium">Payment Status</span>
+        {% if booking.payment_status == "Paid" %}
+          <span class="text-green-600 font-semibold">Paid ✅</span>
+        {% else %}
+          <span class="text-red-600 font-semibold">{{ booking.payment_status }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- 🎯 CTA Buttons -->
+    <div class="flex justify-center gap-4 mb-6">
+      <a href="{% url 'user_landing' user.id %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-5 rounded-xl transition">
+        Home
+      </a>
+      <a href="{% url 'hotel_my_bookings' user.id %}" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-5 rounded-xl transition">
+        View My Bookings
+      </a>
+    </div>
+
+    <!-- 🔒 Trust Section -->
+    <p class="text-sm text-gray-400">
+      🔐 Secure Payment • 🕓 24/7 Support • 🧳 Hassle-Free Check-in
+    </p>
+
+  </div>
+
+  <!-- 🎬 Lottie Animation Script -->
+  <script>
+    lottie.loadAnimation({
+      container: document.getElementById('success-animation'),
+      renderer: 'svg',
+      loop: false,
+      autoplay: true,
+      path: 'https://assets10.lottiefiles.com/packages/lf20_pqnfmone.json'
+    });
+  </script>
+
+</body>
+</html>

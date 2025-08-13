@@ -1,0 +1,213 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Review Booking - {{ booking.id }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f5f7fa; /* Light, calming background */
+      line-height: 1.6;
+      color: #334155; /* Soft dark gray text */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .card-modern {
+      background-color: #ffffff;
+      border-radius: 1rem; /* Slightly rounded, modern corners */
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* A pronounced, soft shadow */
+      padding: 2.5rem; /* Ample padding for breathing room */
+      border: 1px solid #e0e7ee; /* A very subtle border for definition */
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-modern:hover {
+      transform: translateY(-5px); /* Gentle lift on hover */
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12); /* Slightly larger shadow on hover */
+    }
+    .text-primary-brand {
+      color: #3b82f6; /* A vibrant blue for primary elements */
+    }
+    .button-action {
+      background-image: linear-gradient(to right, #3b82f6, #2563eb); /* Blue gradient for action button */
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      font-weight: 700; /* Bold text for impact */
+    }
+    .button-action:hover {
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+      transform: translateY(-2px);
+    }
+    .button-action:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+    .subtle-divider {
+      border-top: 1px dashed #cbd5e1; /* A subtle dashed line for separation */
+      margin: 2rem 0;
+    }
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    .detail-label {
+        font-size: 0.875rem; /* text-sm */
+        color: #64748b; /* Soft gray for labels */
+        font-weight: 500; /* Medium weight */
+    }
+    .detail-value {
+        font-size: 1.125rem; /* text-lg */
+        color: #1f2937; /* Darker for values */
+        font-weight: 600; /* Semibold weight */
+    }
+  </style>
+</head>
+<body class="py-12 bg-gray-50 text-gray-800">
+  <div class="max-w-4xl mx-auto px-6">
+
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight leading-tight mb-3">
+        Review Your <span class="text-primary-brand">Flight Booking</span>
+      </h1>
+      <p class="text-lg text-gray-600">Please verify all details before proceeding to payment.</p>
+    </div>
+
+    <div class="card-modern mb-8">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 mb-6 border-b border-gray-200">
+        <div class="mb-4 md:mb-0">
+          <p class="text-xl font-semibold text-gray-800 mb-1">{{ flight.aircraft_type.owner.Companyname }}</p>
+          <p class="text-sm text-gray-500">Flight No: <span class="font-medium text-gray-700">{{ flight.flight_number }}</span></p>
+        </div>
+        <div class="text-left md:text-right">
+          <p class="text-3xl font-extrabold text-primary-brand leading-tight mb-1">{{ flight.departure_airport }} &rarr; {{ flight.arrival_airport }}</p>
+          <p class="text-base text-gray-500">{{ flight.departure_time|date:"D, M d, Y" }}</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-y-6 gap-x-8">
+        <div class="detail-item">
+          <p class="detail-label">Departure Time</p>
+          <p class="detail-value">{{ flight.departure_time|date:"h:i A" }}</p>
+        </div>
+        <div class="detail-item">
+          <p class="detail-label">Arrival Time</p>
+          <p class="detail-value">{{ flight.arrival_time|date:"h:i A" }}</p>
+        </div>
+        <div class="detail-item">
+          <p class="detail-label">Duration</p>
+          <p class="detail-value">{{ flight.duration }}</p>
+        </div>
+        <div class="detail-item">
+          <p class="detail-label">Travel Class</p>
+          <p class="detail-value">{{ booking.class_type }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-modern mb-8">
+        <h3 class="text-2xl font-bold mb-6 text-gray-900">Passenger Information</h3>
+        {% for item in passengers_with_seats %}
+          {% with passenger=item.data seat=item.seat %}
+          <div class="pb-5 mb-5 {% if not forloop.last %}border-b border-gray-200{% endif %}">
+            <div class="flex justify-between items-center mb-2">
+                <p class="font-semibold text-lg text-gray-800">{{ forloop.counter }}. {{ passenger.firstname }} {{ passenger.lastname }}</p>
+                <a href="{% url 'edit_passenger' passenger.id %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium transition duration-200">Edit</a>
+            </div>
+            <p class="text-sm text-gray-600 mb-1">Email: <span class="font-medium">{{ passenger.email }}</span></p>
+            <p class="text-sm text-gray-600 mb-2">Phone: <span class="font-medium">{{ passenger.phonenumber }}</span></p>
+            <p class="text-base font-bold text-primary-brand">Seat: {{ seat }}</p>
+          </div>
+          {% endwith %}
+        {% empty %}
+          <p class="text-gray-600 text-center py-4">No passenger details found. Please add passengers.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card-modern mb-10">
+      <h3 class="text-2xl font-bold mb-6 text-gray-900">Fare Summary</h3>
+      <div class="space-y-3">
+        <div class="flex justify-between text-gray-700">
+          <span>Base Fare ({{ passengers_with_seats|length }} Passenger{{ passengers_with_seats|length|pluralize }})</span>
+          <span class="font-medium">₹{{ base_price|floatformat:2 }}</span>
+        </div>
+        <div class="flex justify-between text-gray-700">
+          <span>Taxes & Fees</span>
+          <span class="font-medium">₹{{ tax_amount|floatformat:2 }}</span> </div>
+        <div class="subtle-divider"></div>
+        <div class="flex justify-between font-bold text-xl text-gray-900">
+          <span>Total Payable</span>
+          <span class="text-primary-brand text-2xl">₹{{ booking.total_price|floatformat:2 }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <!-- Razorpay Payment Button -->
+<button id="rzp-button"
+  class="w-full button-action text-white text-xl py-4 px-6 rounded-lg shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-75">
+  Proceed to Payment (₹{{ booking.total_price|floatformat:2 }})
+</button>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  const options = {
+    "key": "{{ razorpay_key }}", // Your Razorpay public key
+    "amount": "{{ amount }}", // Amount in paise
+    "currency": "INR",
+    "name": "Aerotrack",
+    "description": "Flight Booking Payment",
+    "order_id": "{{ razorpay_order_id }}",
+    "handler": function (response) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = "{% url 'payment_success' booking.id %}";
+
+      const csrfToken = document.createElement('input');
+      csrfToken.type = 'hidden';
+      csrfToken.name = 'csrfmiddlewaretoken';
+      csrfToken.value = '{{ csrf_token }}';
+      form.appendChild(csrfToken);
+
+      ['razorpay_order_id', 'razorpay_payment_id', 'razorpay_signature'].forEach(key => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = response[key];
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+    },
+    "theme": {
+      "color": "#2563eb"
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  document.getElementById('rzp-button').onclick = function(e){
+    rzp.open();
+    e.preventDefault();
+  }
+</script>
+
+    </div>
+  </div>
+
+  <script>
+    function disablePaymentButton(event) {
+      const btn = document.getElementById("paymentButton");
+      btn.disabled = true;
+      btn.textContent = "Processing Payment...";
+      btn.classList.add('opacity-70', 'cursor-not-allowed', 'shadow-none');
+      btn.classList.remove('button-action'); // Remove hover effects
+    }
+  </script>
+</body>
+</html>

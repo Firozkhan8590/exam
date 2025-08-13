@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroTrack - Flight Tracking & Travel Booking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#3b82f6',secondary:'#64748b'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        .hero-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://readdy.ai/api/search-image?query=Aerial%20view%20of%20a%20modern%20passenger%20airplane%20flying%20above%20fluffy%20white%20clouds%20during%20sunset%2C%20with%20golden%20sunlight%20illuminating%20the%20sky%2C%20creating%20a%20breathtaking%20and%20serene%20atmosphere%2C%20perfect%20for%20a%20travel%20booking%20website%20hero%20section%2C%20high%20resolution%20professional%20photography&width=1920&height=1080&seq=1&orientation=landscape');
+            background-size: cover;
+            background-position: center;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        input:focus {
+            outline: none;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-transparant-900 text-white fixed w-full z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="text-2xl font-['Pacifico'] text-white">AeroTrack</a>
+            
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#" class="hover:text-primary transition-colors">Home</a>
+                <a href="#features" class="hover:text-primary transition-colors">Features</a>
+                <a href="#about" class="hover:text-primary transition-colors">About</a>
+                 <a href="{% url 'ownerindex' %}" class="hover:text-primary transition-colors"> Owner</a>
+                <a href="{% url 'register' %}" class=" bg-transparant-800 hover:text-primary rounded-button whitespace-nowrap transition-colors">Register</a>
+                <a href="{% url 'login' %}" class="bg-transparant-500 hover:text-primary rounded-button whitespace-nowrap transition-colors">Login</a>
+            </div>
+            
+            <button class="md:hidden w-10 h-10 flex items-center justify-center">
+                <i class="ri-menu-line ri-2x"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section h-screen flex items-center justify-center text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">Track Flights & Book Travel</h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">Real-time flight tracking, seamless booking, and personalized travel management all in one platform.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{% url 'register' %}" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-button text-lg font-semibold whitespace-nowrap transition-colors">Get Started</a>
+                <a href="#feature" class="px-8 py-4 bg-white hover:bg-gray-300 text-gray-900 rounded-button text-lg font-semibold whitespace-nowrap transition-colors">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+   
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Why Choose AeroTrack</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Discover how our comprehensive flight tracking and booking platform makes travel planning effortless.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card bg-white p-6 rounded-xl shadow-md transition-all duration-300">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="ri-flight-line ri-xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Live Flight Tracking</h3>
+                    <p class="text-gray-600">Track any flight in real-time with accurate updates on location, altitude, speed, and estimated arrival times.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card bg-white p-6 rounded-xl shadow-md transition-all duration-300">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="ri-calendar-check-line ri-xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Instant Booking</h3>
+                    <p class="text-gray-600">Book flights, hotels, and car rentals in minutes with our streamlined reservation system and secure payment process.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card bg-white p-6 rounded-xl shadow-md transition-all duration-300">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="ri-customer-service-2-line ri-xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">24/7 Support</h3>
+                    <p class="text-gray-600">Access round-the-clock customer service through chat, email, or phone for immediate assistance with any travel concerns.</p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="feature-card bg-white p-6 rounded-xl shadow-md transition-all duration-300">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="ri-shield-check-line ri-xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Secure Payments</h3>
+                    <p class="text-gray-600">Enjoy peace of mind with our encrypted payment system, supporting multiple currencies and payment methods.</p>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="feature-card bg-white p-6 rounded-xl shadow-md transition-all duration-300">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="ri-notification-line ri-xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Flight Alerts</h3>
+                    <p class="text-gray-600">Receive timely notifications about gate changes, delays, cancellations, and other important flight updates.</p>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="feature-card bg-white p-6 rounded-xl shadow-md transition-all duration-300">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="ri-device-line ri-xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Multi-Device Access</h3>
+                    <p class="text-gray-600">Access your bookings and tracking information seamlessly across desktop, tablet, and mobile devices.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="text-4xl font-bold text-primary mb-2">5,000+</div>
+                    <p class="text-gray-600">Airlines Tracked</p>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-primary mb-2">180+</div>
+                    <p class="text-gray-600">Countries Covered</p>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-primary mb-2">2.5M+</div>
+                    <p class="text-gray-600">Monthly Users</p>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-primary mb-2">99.9%</div>
+                    <p class="text-gray-600">Uptime Reliability</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6">About AeroTrack</h2>
+                    <p class="text-lg text-gray-600 mb-6">AeroTrack is a comprehensive flight tracking and travel booking platform designed to make your journey planning seamless and stress-free. Our mission is to provide travelers with accurate, real-time information and hassle-free booking options.</p>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4">Our Key Benefits</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <div class="w-6 h-6 flex items-center justify-center text-primary mr-2">
+                                    <i class="ri-check-line"></i>
+                                </div>
+                                <span class="text-gray-700">Global coverage of over 5,000 airlines and 180+ countries</span>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="w-6 h-6 flex items-center justify-center text-primary mr-2">
+                                    <i class="ri-check-line"></i>
+                                </div>
+                                <span class="text-gray-700">Real-time updates with 99.9% accuracy</span>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="w-6 h-6 flex items-center justify-center text-primary mr-2">
+                                    <i class="ri-check-line"></i>
+                                </div>
+                                <span class="text-gray-700">Competitive pricing with price match guarantee</span>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="w-6 h-6 flex items-center justify-center text-primary mr-2">
+                                    <i class="ri-check-line"></i>
+                                </div>
+                                <span class="text-gray-700">Personalized travel recommendations based on your preferences</span>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="w-6 h-6 flex items-center justify-center text-primary mr-2">
+                                    <i class="ri-check-line"></i>
+                                </div>
+                                <span class="text-gray-700">Dedicated customer support available 24/7</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <a href="{% url 'feature' %}" class="px-6 py-3 bg-primary hover:bg-blue-500 text-white rounded-button font-semibold whitespace-nowrap transition-colors inline-block">Learn More About Us</a>
+                </div>
+                
+                <div class="md:w-1/2">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-primary rounded-xl transform translate-x-4 translate-y-4 -z-10"></div>
+                        <img src="https://readdy.ai/api/search-image?query=Modern%20flight%20tracking%20app%20interface%20displayed%20on%20multiple%20devices%20including%20smartphone%2C%20tablet%20and%20laptop%2C%20showing%20a%20flight%20path%20map%20with%20clean%20UI%20design%2C%20professional%20product%20photography%20with%20soft%20lighting%20and%20neutral%20background&width=600&height=500&seq=2&orientation=landscape" alt="AeroTrack App Interface" class="rounded-xl shadow-lg w-full object-cover object-top" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">What Our Users Say</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Discover why travelers around the world trust AeroTrack for their flight tracking and booking needs.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-white p-8 rounded-xl shadow-md">
+                    <div class="flex items-center mb-4">
+                        <div class="text-primary">
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-6">"AeroTrack has completely transformed how I plan my business trips. The real-time flight tracking and instant notifications have saved me countless hours at airports. Highly recommended!"</p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gray-200 rounded-full mr-4"></div>
+                        <div>
+                            <h4 class="font-semibold">Michael Richardson</h4>
+                            <p class="text-sm text-gray-500">Business Traveler</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-white p-8 rounded-xl shadow-md">
+                    <div class="flex items-center mb-4">
+                        <div class="text-primary">
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-6">"As a travel blogger who's constantly on the move, AeroTrack has become my go-to app. The booking interface is intuitive, and I love how I can track my family's flights when we travel separately."</p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gray-200 rounded-full mr-4"></div>
+                        <div>
+                            <h4 class="font-semibold">Sophia Martinez</h4>
+                            <p class="text-sm text-gray-500">Travel Blogger</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-white p-8 rounded-xl shadow-md">
+                    <div class="flex items-center mb-4">
+                        <div class="text-primary">
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-fill"></i>
+                            <i class="ri-star-half-fill"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-6">"The customer service at AeroTrack is exceptional. When my flight was canceled, their team helped me rebook immediately and even secured accommodation. This level of service is rare these days!"</p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gray-200 rounded-full mr-4"></div>
+                        <div>
+                            <h4 class="font-semibold">James Wilson</h4>
+                            <p class="text-sm text-gray-500">Frequent Flyer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- CTA Section -->
+    <section class="py-20 bg-primary text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Simplify Your Travel Experience?</h2>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">Join thousands of satisfied travelers who rely on AeroTrack for seamless flight tracking and booking.</p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#" class="px-8 py-4 bg-white text-primary hover:bg-gray-100 rounded-button text-lg font-semibold whitespace-nowrap transition-colors">Sign Up Free</a>
+                <a href="#" class="px-8 py-4 bg-transparent border-2 border-white hover:bg-white hover:text-primary rounded-button text-lg font-semibold whitespace-nowrap transition-colors">Download App</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <!-- Company Info -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">AeroTrack</h3>
+                    <p class="text-gray-400 mb-4">Your comprehensive flight tracking and travel booking platform, designed to make journey planning seamless and stress-free.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="ri-facebook-fill"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="ri-twitter-fill"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="ri-instagram-fill"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="ri-linkedin-fill"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors">Features</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Services -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Services</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Flight Tracking</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Flight Booking</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Hotel Reservations</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Car Rentals</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Travel Insurance</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Vacation Packages</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Contact Us</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <div class="w-5 h-5 flex items-center justify-center text-primary mr-3 mt-1">
+                                <i class="ri-map-pin-line"></i>
+                            </div>
+                            <span class="text-gray-400">123 Aviation Way, San Francisco, CA 94158, USA</span>
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-5 h-5 flex items-center justify-center text-primary mr-3">
+                                <i class="ri-phone-line"></i>
+                            </div>
+                            <span class="text-gray-400">+1 (800) 123-4567</span>
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-5 h-5 flex items-center justify-center text-primary mr-3">
+                                <i class="ri-mail-line"></i>
+                            </div>
+                            <span class="text-gray-400">support@aerotrack.com</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="mt-6">
+                        <h4 class="text-lg font-semibold mb-3">Subscribe to Newsletter</h4>
+                        <div class="flex">
+                            <input type="email" placeholder="Your email" class="px-4 py-2 bg-gray-800 text-white rounded-l-button border-none focus:outline-none flex-1" />
+                            <button class="px-4 py-2 bg-primary hover:bg-blue-500 rounded-r-button whitespace-nowrap transition-colors">Subscribe</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pt-8 border-t border-gray-800 text-center text-gray-500">
+                <div class="flex flex-wrap justify-center gap-4 mb-4">
+                    <div class="flex items-center">
+                        <i class="ri-visa-fill ri-lg mr-1"></i> Visa
+                    </div>
+                    <div class="flex items-center">
+                        <i class="ri-mastercard-fill ri-lg mr-1"></i> Mastercard
+                    </div>
+                    <div class="flex items-center">
+                        <i class="ri-paypal-fill ri-lg mr-1"></i> PayPal
+                    </div>
+                    <div class="flex items-center">
+                        <i class="ri-apple-fill ri-lg mr-1"></i> Apple Pay
+                    </div>
+                    <div class="flex items-center">
+                        <i class="ri-google-fill ri-lg mr-1"></i> Google Pay
+                    </div>
+                </div>
+                <p>&copy; 2025 AeroTrack. All rights reserved. | <a href="#" class="hover:text-gray-300">Privacy Policy</a> | <a href="#" class="hover:text-gray-300">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script id="navbarToggle">
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuButton = document.querySelector('.md\\:hidden');
+            const mobileMenu = document.createElement('div');
+            mobileMenu.className = 'fixed inset-0 bg-gray-900 z-40 flex flex-col items-center justify-center space-y-6 text-xl transform transition-transform duration-300 translate-x-full';
+            document.body.appendChild(mobileMenu);
+            
+            const links = [
+                { text: 'Home', href: '#' },
+                { text: 'Features', href: '#features' },
+                { text: 'About', href: '#about' },
+                { text: 'Register', href: '#', class: 'px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-button whitespace-nowrap' },
+                { text: 'Login', href: '#', class: 'px-4 py-2 bg-primary hover:bg-blue-500 rounded-button whitespace-nowrap' }
+            ];
+            
+            links.forEach(link => {
+                const a = document.createElement('a');
+                a.href = link.href;
+                a.textContent = link.text;
+                a.className = link.class || 'hover:text-primary transition-colors';
+                mobileMenu.appendChild(a);
+            });
+            
+            const closeButton = document.createElement('button');
+            closeButton.className = 'absolute top-4 right-4 w-10 h-10 flex items-center justify-center';
+            closeButton.innerHTML = '<i class="ri-close-line ri-2x"></i>';
+            mobileMenu.appendChild(closeButton);
+            
+            menuButton.addEventListener('click', function() {
+                mobileMenu.classList.remove('translate-x-full');
+                mobileMenu.classList.add('translate-x-0');
+            });
+            
+            closeButton.addEventListener('click', function() {
+                mobileMenu.classList.remove('translate-x-0');
+                mobileMenu.classList.add('translate-x-full');
+            });
+            
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.remove('translate-x-0');
+                    mobileMenu.classList.add('translate-x-full');
+                });
+            });
+        });
+    </script>
+
+    <script id="smoothScroll">
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

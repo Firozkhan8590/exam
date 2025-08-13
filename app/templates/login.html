@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AeroTrack - Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS Variables for Corporate Theming */
+        :root {
+            --corporate-blue: #1A3E6C; /* Deep, professional blue */
+            --corporate-blue-dark: #122c4f; /* Even darker for hover */
+            --corporate-gray-light: #f8f9fa; /* Very subtle background */
+            --corporate-gray-medium: #e9ecef; /* Input borders */
+            --corporate-text-dark: #212529; /* Dark, authoritative text */
+            --corporate-text-medium: #495057; /* Standard text */
+            --white: #ffffff;
+            --shadow-corporate: rgba(0, 0, 0, 0.1); /* Crisp, professional shadow */
+            --transition-speed: 0.3s ease-in-out;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--white); /* Clean, light background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            background-image: linear-gradient(135deg, var(--white) 50%, #e0e5ea 100%); /* Subtle gradient background */
+        }
+
+        .login-box {
+            max-width: 480px; /* Slightly larger for a more substantial feel */
+            width: 100%;
+            padding: 50px; /* More generous padding */
+            background: var(--white);
+            border-radius: 12px; /* Less rounded than 'modern', more professional */
+            box-shadow: 0 8px 25px var(--shadow-corporate); /* Clearer, defined shadow */
+            animation: fadeIn 0.6s ease-out forwards; /* Simple fade-in */
+            border: 1px solid var(--corporate-gray-medium); /* Subtle border for definition */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-box h2 {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            margin-bottom: 40px; /* More vertical space */
+            font-weight: 700; /* Bold and authoritative */
+            font-size: 2.5rem; /* Prominent title */
+            color: var(--corporate-text-dark);
+            position: relative;
+        }
+
+        .login-box h2::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -15px; /* Deeper separation from title */
+            transform: translateX(-50%);
+            width: 80px; /* Wider underline */
+            height: 5px; /* Thicker underline */
+            background-color: var(--corporate-blue);
+            border-radius: 3px;
+        }
+
+        .form-label {
+            font-weight: 600; /* Stronger label weight */
+            color: var(--corporate-text-medium);
+            margin-bottom: 10px;
+            display: block;
+            font-size: 1rem; /* Clearer label font size */
+        }
+
+        .form-control {
+            border-radius: 8px; /* Slightly less rounded inputs */
+            padding: 15px 20px; /* Increased padding for substantial inputs */
+            border: 1px solid var(--corporate-gray-medium); /* Defined border */
+            font-size: 1.05rem; /* Larger input text */
+            color: var(--corporate-text-dark);
+            transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        .form-control:focus {
+            border-color: var(--corporate-blue); /* Strong focus border */
+            box-shadow: 0 0 0 0.25rem rgba(26, 62, 108, 0.2); /* Muted, corporate-friendly glow */
+            outline: none; /* Remove default outline */
+        }
+
+        .btn-primary {
+            background-color: var(--corporate-blue);
+            border-color: var(--corporate-blue);
+            padding: 16px 45px; /* Larger, more commanding button */
+            border-radius: 8px;
+            font-size: 1.2rem; /* Clear button text */
+            font-weight: 700; /* Bold button text */
+            letter-spacing: 0.8px; /* Slight letter spacing for prominence */
+            transition: all var(--transition-speed);
+            box-shadow: 0 5px 15px rgba(26, 62, 108, 0.2); /* Solid button shadow */
+            margin-top: 25px; /* More space above button */
+        }
+
+        .btn-primary:hover {
+            background-color: var(--corporate-blue-dark);
+            border-color: var(--corporate-blue-dark);
+            transform: translateY(-2px); /* Subtle lift */
+            box-shadow: 0 8px 20px rgba(26, 62, 108, 0.3); /* Enhanced shadow on hover */
+        }
+
+        .alert {
+            border-radius: 8px; /* Match form elements */
+            padding: 18px 25px;
+            margin-bottom: 30px;
+            font-weight: 500;
+            font-size: 1rem;
+            animation: slideDownFadeIn 0.5s ease-out forwards;
+            border: 1px solid; /* Ensure border is visible */
+        }
+
+        @keyframes slideDownFadeIn {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 30px; /* Ample space for footer links */
+            font-size: 0.95rem;
+            color: var(--corporate-text-medium);
+            line-height: 1.6; /* Better line spacing for readability */
+        }
+
+        .form-footer a {
+            text-decoration: none;
+            color: var(--corporate-blue);
+            font-weight: 600;
+            transition: color var(--transition-speed), text-decoration var(--transition-speed);
+        }
+
+        .form-footer a:hover {
+            color: var(--corporate-blue-dark);
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            body {
+                padding: 15px;
+            }
+            .login-box {
+                padding: 35px;
+                border-radius: 10px;
+            }
+            .login-box h2 {
+                font-size: 2rem;
+                margin-bottom: 30px;
+            }
+            .login-box h2::after {
+                height: 4px;
+                bottom: -10px;
+            }
+            .form-control {
+                padding: 12px 16px;
+                font-size: 1rem;
+            }
+            .btn-primary {
+                padding: 14px 30px;
+                font-size: 1.1rem;
+                letter-spacing: 0;
+            }
+            .alert {
+                padding: 15px;
+                font-size: 0.9rem;
+            }
+            .form-footer {
+                margin-top: 25px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <h2>AeroTrack Login</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="mb-4"> <label for="username" class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" placeholder="Enter your username" required>
+            </div>
+
+            <div class="mb-4"> <label for="password" class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Secure Login</button>
+        </form>
+
+        <div class="form-footer">
+            <p><a href="{% url 'forgot_password' %}">Forgot Password?</a></p>
+            <p>New to AeroTrack? <a href="{% url 'register' %}">Create an Account</a></p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

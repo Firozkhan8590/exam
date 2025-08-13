@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Hotels</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      /* A fresh, vibrant background for a modern feel */
+      background: linear-gradient(135deg, #a7e0ff 0%, #d0e7ff 100%);
+      color: #334155; /* Default text color */
+    }
+
+    /* Custom Glassmorphism effect for cards */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.6); /* Slightly more opaque background */
+      backdrop-filter: blur(10px) saturate(180%);
+      -webkit-backdrop-filter: blur(10px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    }
+
+    /* Custom shadow for buttons */
+    .btn-shadow {
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+    }
+    .btn-shadow:hover {
+        box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3);
+    }
+  </style>
+</head>
+<body class="antialiased">
+
+  <div class="min-h-screen p-6 sm:p-10 lg:p-16">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col sm:flex-row sm:items-center mb-16">
+        <h1 class="text-5xl lg:text-6xl font-extrabold text-blue-900 mb-6 sm:mb-0 leading-tight tracking-tight">
+          Hotel Explorer
+        </h1>
+
+        <form method="POST" class="flex w-full sm:w-auto rounded-full overflow-hidden shadow-xl btn-shadow mt-6 sm:mt-0 sm:mx-auto">
+          {% csrf_token %}
+          <input
+            type="text"
+            name="search"
+            placeholder="Search by hotel or city..."
+            class="w-full sm:w-80 px-8 py-4 bg-white border-none rounded-l-full focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-offset-0 transition-all duration-300 ease-in-out text-lg placeholder-gray-500"
+          />
+          <button
+            type="submit"
+            class="px-8 py-4 bg-indigo-600 text-white rounded-r-full hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-offset-0 transition-all duration-300 ease-in-out text-lg font-semibold"
+          >
+            Search
+          </button>
+        </form>
+
+        <a
+          href="{% url 'admindashboard' %}"
+          class="inline-flex items-center px-6 py-3 bg-white text-indigo-700 font-semibold rounded-full shadow-md hover:bg-indigo-50 transition duration-300 ease-in-out btn-shadow mt-6 sm:mt-0 sm:ml-auto"
+        >
+          ← Back to Dashboard
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-12">
+        {% for h in hotel %}
+        <div class="glass-card rounded-3xl hover:shadow-2xl hover:scale-[1.02] transform transition-all duration-300 ease-in-out overflow-hidden group relative">
+          <div class="relative overflow-hidden">
+            <img
+              src="{% if h.image %}{{ h.image.url }}{% else %}{% static 'images/placeholder.jpg' %}{% endif %}"
+              alt="{{ h.hotel_name }}"
+              class="w-full h-72 object-cover object-center group-hover:scale-110 transition-transform duration-500 ease-out"
+              onerror="this.onerror=null;this.src='{% static 'images/images/placeholder.jpg' %}';"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent"></div>
+          </div>
+
+          <div class="p-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2 leading-tight">{{ h.hotel_name }}</h2>
+            <p class="text-gray-600 text-lg mb-6">{{ h.city }}</p>
+
+            <div class="flex items-end justify-between mt-8">
+              {% with h.rooms.all|dictsort:"price_per_night"|first as cheapest_room %}
+                {% if cheapest_room %}
+                  <div>
+                    <span class="text-indigo-700 text-3xl font-extrabold">₹{{ cheapest_room.price_per_night }}</span>
+                    <span class="text-gray-600 text-base font-small">/night</span>
+                  </div>
+                {% else %}
+                  <span class="text-red-500 text-base font-medium">No rooms available</span>
+                {% endif %}
+              {% endwith %}
+              <div class="flex gap-3">
+                <a
+                  href="#"
+                  class="bg-indigo-600 text-white px-6 py-3 rounded-full hover:bg-indigo-700 transition text-sm font-semibold shadow-md btn-shadow"
+                >
+                  View Details
+                </a>
+
+                <a
+                  href="{% url 'delete_hotels' h.id %}"
+                  onclick="return confirm('Are you sure you want to delete this hotel?');"
+                  class="bg-red-500 text-white px-6 py-3 rounded-full hover:bg-red-600 transition text-sm font-semibold shadow-md btn-shadow"
+                >
+                  Delete
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <p class="col-span-full text-center text-gray-600 text-xl py-20 font-semibold">No hotels found. Try a different search term!</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

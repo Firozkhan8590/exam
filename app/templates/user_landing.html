@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AeroTrack - Your All-in-One Travel Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#4F46E5", secondary: "#10B981" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      :where([class^="ri-"])::before { content: "\f3c2"; }
+
+      .carousel-container {
+          position: relative;
+          overflow: hidden;
+      }
+
+      .search-container input:focus {
+          outline: none;
+      }
+
+      .hotel-scroll::-webkit-scrollbar {
+          display: none;
+      }
+
+      .hotel-scroll {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+      }
+
+      .custom-checkbox {
+          position: relative;
+          display: inline-block;
+          width: 20px;
+          height: 20px;
+          border-radius: 4px;
+          border: 2px solid #cbd5e1;
+          background-color: white;
+          cursor: pointer;
+      }
+
+      .custom-checkbox.checked {
+          background-color: #4F46E5;
+          border-color: #4F46E5;
+      }
+
+      .custom-checkbox.checked:after {
+          content: '';
+          position: absolute;
+          left: 6px;
+          top: 2px;
+          width: 5px;
+          height: 10px;
+          border: solid white;
+          border-width: 0 2px 2px 0;
+          transform: rotate(45deg);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 font-sans">
+    <!-- Header Section -->
+    <header class="w-full bg-white shadow-sm sticky top-0 z-50">
+      <div
+        class="container mx-auto px-4 py-4 flex items-center justify-between"
+      >
+        <div class="flex items-center">
+          <a href="#" class="text-3xl font-['Pacifico'] text-primary mr-10"
+            >AeroTrack</a
+          >
+          <nav class="hidden md:flex space-x-8">
+            <a
+              href="{% url 'flighthome' user.id %}"
+              class="text-gray-800 hover:text-blue-600 font-medium transition-colors"
+              >Flights</a
+            >
+            <a
+              href="{% url 'hotel_search' user.id %}"
+              class="text-gray-800 hover:text-blue-600 font-medium transition-colors"
+              >Hotels</a
+            >
+            <button
+              onclick="openComingSoonModal('Train booking feature coming soon.')"
+              class="text-gray-800 hover:text-blue-600 font-medium transition-colors"
+            >
+              Trains
+            </button>
+            <button
+              onclick="openComingSoonModal('Explore activities will be available soon.')"
+              class="text-gray-800 hover:text-blue-600 font-medium transition-colors"
+            >
+              Activities
+            </button>
+          </nav>
+
+        </div>
+
+        <div class="flex items-center space-x-6">
+          <div class="relative">
+            <button class="flex items-center text-gray-700 hover:text-primary">
+              <span class="mr-1">EN</span>
+              <div class="w-4 h-4 flex items-center justify-center">
+                <i class="ri-arrow-down-s-line"></i>
+              </div>
+            </button>
+          </div>
+
+          <a
+            href="{% url 'userprofile' user.id %}"
+            class="flex items-center text-gray-700 hover:text-primary"
+          >
+            <div class="w-5 h-5 flex items-center justify-center mr-1">
+              <i class="ri-user-line"></i>
+            </div>
+            <span>{{user.username}}</span>
+          </a>
+
+          <button
+            class="md:hidden w-10 h-10 flex items-center justify-center text-gray-700"
+          >
+            <i class="ri-menu-line text-2xl"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section
+      class="relative w-full"
+      style="background-image: url('https://readdy.ai/api/search-image?query=stunning%20travel%20destination%20with%20beautiful%20beach%2C%20crystal%20clear%20turquoise%20water%2C%20palm%20trees%2C%20and%20a%20luxury%20resort%20in%20the%20background.%20The%20left%20side%20of%20the%20image%20should%20have%20a%20smooth%20gradient%20transition%20to%20a%20clean%20light%20background%20for%20text%20overlay.%20Professional%20travel%20photography%20style%2C%20high%20resolution%2C%20cinematic%20lighting&width=1920&height=800&seq=hero1&orientation=landscape'); background-size: cover; background-position: center;"
+    >
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent"
+      ></div>
+      <div class="container mx-auto px-4 py-24 relative z-10">
+        <div class="w-full md:w-1/2 lg:w-2/5">
+          <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Where Adventure Begins
+          </h1>
+          <p class="text-lg text-gray-700 mb-8">
+            Discover amazing destinations, book flights, track trains, and find
+            the perfect hotel - all in one place. Your journey starts with
+            AeroTrack.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="{% url 'feature' %}"
+              class="bg-primary text-white px-6 py-3 !rounded-button font-medium hover:bg-primary/90 transition-colors whitespace-nowrap"
+            >
+              Explore Now
+          </a>
+            <button
+              class="bg-white text-primary border border-primary px-6 py-3 !rounded-button font-medium hover:bg-gray-50 transition-colors whitespace-nowrap"
+            >
+              Learn More
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search Section -->
+<form method="post" action="{% url 'hotel_search' %}">
+  {% csrf_token %}
+  <section class="bg-white py-8">
+    <div class="container mx-auto px-4">
+      <div class="bg-white shadow-lg !rounded-lg p-6 -mt-16 relative z-20">
+        <div class="flex flex-col md:flex-row gap-4">
+        
+          <!-- Destination -->
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Destination</label>
+            <div class="search-container relative">
+              <div class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400">
+                <i class="ri-map-pin-line"></i>
+              </div>
+              <input
+                type="text"
+                name="city"
+                value="{{ city }}"
+                placeholder="Where are you going?"
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 !rounded text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+              />
+            </div>
+          </div>
+
+          <!-- Check-in -->
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
+            <div class="search-container relative">
+              <div class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400">
+                <i class="ri-calendar-line"></i>
+              </div>
+              <input
+                type="date"
+                name="checkin"
+                value="{{ checkin }}"
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 !rounded text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+              />
+            </div>
+          </div>
+
+          <!-- Check-out -->
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Check-out</label>
+            <div class="search-container relative">
+              <div class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400">
+                <i class="ri-calendar-line"></i>
+              </div>
+              <input
+                type="date"
+                name="checkout"
+                value="{{ checkout }}"
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 !rounded text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+              />
+            </div>
+          </div>
+
+          <!-- Travelers -->
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Travelers</label>
+            <div class="search-container relative">
+              <div class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400">
+                <i class="ri-user-line"></i>
+              </div>
+              <input
+                type="number"
+                name="adults"
+                min="1"
+                value="{{ adults }}"
+                class="w-full pl-10 pr-8 py-3 border border-gray-300 !rounded text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+              />
+              <div class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400 pointer-events-none">
+                <i class="ri-arrow-down-s-line"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search Button -->
+          <div class="flex items-end">
+            <button
+              type="submit"
+              class="w-full md:w-auto bg-primary text-white px-6 py-3 !rounded-button font-medium hover:bg-primary/90 transition-colors whitespace-nowrap"
+            >
+              <div class="flex items-center">
+                <div class="w-5 h-5 flex items-center justify-center mr-2">
+                  <i class="ri-search-line"></i>
+                </div>
+                <span>Search</span>
+              </div>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</form>
+
+
+    <!-- Quick Access Features -->
+    <section class="py-16 bg-gray-50">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">
+            Quick Access Features
+          </h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">
+            Everything you need for your travel planning in one place. Book
+            flights and find hotels, and discover exciting
+            activities and track train in future.
+          </p>
+        </div>
+
+        <div class="flex justify-center">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
+
+
+          <!-- Flight Tracking -->
+          <div
+            class="bg-white !rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 flex flex-col items-center text-center"
+          >
+            <div
+              class="w-16 h-16 flex items-center justify-center bg-primary/10 !rounded-full mb-4"
+            >
+              <i class="ri-flight-takeoff-line text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+              Flight Tracking
+            </h3>
+            <p class="text-gray-600 mb-6">
+              Real-time updates on flight status, delays, and gate changes for
+              any airline worldwide.
+            </p>
+            <a href="{% url 'flighthome' user.id %}"
+              class="mt-auto bg-white text-primary border border-primary px-5 py-2 !rounded-button font-medium hover:bg-gray-50 transition-colors whitespace-nowrap"
+            >
+              Track Flight
+          </a>
+          </div>
+
+          
+
+          <!-- Hotel Bookings -->
+          <div
+            class="bg-white !rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 flex flex-col items-center text-center "
+          >
+            <div
+              class="w-16 h-16 flex items-center justify-center bg-primary/10 !rounded-full mb-4"
+            >
+              <i class="ri-hotel-line text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+              Hotel Bookings
+            </h3>
+            <p class="text-gray-600 mb-6">
+              Find and book accommodations that fit your budget and preferences
+              in any destination.
+            </p>
+            <a href="{% url 'hotel_search' user.id %}"
+              class="mt-auto bg-white text-primary border border-primary px-5 py-2 !rounded-button font-medium hover:bg-gray-50 transition-colors whitespace-nowrap"
+            >
+              Find Hotels
+          </a>
+          </div>
+
+         
+        </div>
+      </div>
+      </div>
+      
+    </section>
+
+    
+    <!-- Hotel Recommendations -->
+    
+    <!-- Newsletter Section -->
+    
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-8">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          <div>
+            <a
+              href="#"
+              class="text-3xl font-['Pacifico'] text-white mb-6 inline-block"
+              >AeroTrack</a
+            >
+            <p class="text-gray-400 mb-6">
+              Your all-in-one travel assistant. Book flights, track trains, find
+              hotels, and discover activities worldwide.
+            </p>
+            <div class="flex space-x-4">
+              <a
+                href="#"
+                class="w-10 h-10 flex items-center justify-center bg-gray-800 !rounded-full hover:bg-primary transition-colors"
+              >
+                <i class="ri-facebook-fill"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 flex items-center justify-center bg-gray-800 !rounded-full hover:bg-primary transition-colors"
+              >
+                <i class="ri-twitter-x-fill"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 flex items-center justify-center bg-gray-800 !rounded-full hover:bg-primary transition-colors"
+              >
+                <i class="ri-instagram-fill"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 flex items-center justify-center bg-gray-800 !rounded-full hover:bg-primary transition-colors"
+              >
+                <i class="ri-linkedin-fill"></i>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold mb-6">Quick Links</h3>
+            <ul class="space-y-3">
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors"
+                  >About Us</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors"
+                  >Services</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors"
+                  >Destinations</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors"
+                  >Travel Guides</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors"
+                  >Special Offers</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors"
+                  >Blog</a
+                >
+              </li>
+            </ul>
+          </div>
+
+         
+
+          <div>
+            <h3 class="text-lg font-bold mb-6">Contact Info</h3>
+            <ul class="space-y-3">
+              <li class="flex items-start">
+                <div
+                  class="w-5 h-5 flex items-center justify-center text-gray-400 mr-3 mt-1"
+                >
+                  <i class="ri-map-pin-line"></i>
+                </div>
+                <span class="text-gray-400"
+                  >AeroTrack Technologies Pvt. Ltd.
+                  Technopark Campus,
+                  Thiruvananthapuram - 695581,
+                  Kerala, India
+                  </span
+                >
+              </li>
+              <li class="flex items-start">
+                <div
+                  class="w-5 h-5 flex items-center justify-center text-gray-400 mr-3 mt-1"
+                >
+                  <i class="ri-phone-line"></i>
+                </div>
+                <span class="text-gray-400">+91 8590219012</span>
+              </li>
+              <li class="flex items-start">
+                <div
+                  class="w-5 h-5 flex items-center justify-center text-gray-400 mr-3 mt-1"
+                >
+                  <i class="ri-mail-line"></i>
+                </div>
+                <span class="text-gray-400">info@aerotrack.com</span>
+              </li>
+            </ul>
+            <div class="mt-6">
+              <h3 class="text-lg font-bold mb-4">We Accept</h3>
+              <div class="flex space-x-3">
+                <div
+                  class="w-10 h-6 flex items-center justify-center text-gray-400"
+                >
+                  <i class="ri-visa-fill text-xl"></i>
+                </div>
+                <div
+                  class="w-10 h-6 flex items-center justify-center text-gray-400"
+                >
+                  <i class="ri-mastercard-fill text-xl"></i>
+                </div>
+                <div
+                  class="w-10 h-6 flex items-center justify-center text-gray-400"
+                >
+                  <i class="ri-paypal-fill text-xl"></i>
+                </div>
+                <div
+                  class="w-10 h-6 flex items-center justify-center text-gray-400"
+                >
+                  <i class="ri-apple-fill text-xl"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-800 pt-8">
+          <div class="flex flex-col md:flex-row justify-between items-center">
+            <p class="text-gray-400 text-sm mb-4 md:mb-0">
+              © 2025 AeroTrack. All rights reserved.
+            </p>
+            <div class="flex space-x-6">
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white text-sm transition-colors"
+                >Privacy Policy</a
+              >
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white text-sm transition-colors"
+                >Terms of Service</a
+              >
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white text-sm transition-colors"
+                >Cookie Policy</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- Coming Soon Modal -->
+<div
+  id="comingSoonModal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+>
+  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md text-center">
+    <h2 class="text-xl font-semibold mb-4 text-blue-600">🚧 Coming Soon</h2>
+    <p id="comingSoonMessage" class="text-gray-700 mb-6">
+      This feature is under development.
+    </p>
+    <button
+      onclick="closeComingSoonModal()"
+      class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+    >
+      Okay
+    </button>
+  </div>
+</div>
+
+
+    <script id="carouselScript">
+      document.addEventListener("DOMContentLoaded", function () {
+        // Destination Carousel
+        const destinationCarousel = document.getElementById("destinationCarousel");
+        const prevDestination = document.getElementById("prevDestination");
+        const nextDestination = document.getElementById("nextDestination");
+
+        if (destinationCarousel && prevDestination && nextDestination) {
+          prevDestination.addEventListener("click", function () {
+            destinationCarousel.scrollBy({ left: -350, behavior: "smooth" });
+          });
+
+          nextDestination.addEventListener("click", function () {
+            destinationCarousel.scrollBy({ left: 350, behavior: "smooth" });
+          });
+        }
+
+        // Hotel Carousel
+        const hotelCarousel = document.getElementById("hotelCarousel");
+        const prevHotel = document.getElementById("prevHotel");
+        const nextHotel = document.getElementById("nextHotel");
+
+        if (hotelCarousel && prevHotel && nextHotel) {
+          prevHotel.addEventListener("click", function () {
+            hotelCarousel.scrollBy({ left: -400, behavior: "smooth" });
+          });
+
+          nextHotel.addEventListener("click", function () {
+            hotelCarousel.scrollBy({ left: 400, behavior: "smooth" });
+          });
+        }
+      });
+    </script>
+
+    <script id="checkboxScript">
+      document.addEventListener("DOMContentLoaded", function () {
+        const checkbox = document.getElementById("newsletterCheckbox");
+
+        if (checkbox) {
+          checkbox.addEventListener("click", function () {
+            this.classList.toggle("checked");
+          });
+        }
+      });
+    </script>
+    <script id="modalScript">
+  function openComingSoonModal(message) {
+    const modal = document.getElementById('comingSoonModal');
+    const msg = document.getElementById('comingSoonMessage');
+    if (modal && msg) {
+      msg.innerText = message;
+      modal.classList.remove('hidden');
+    }
+  }
+
+  function closeComingSoonModal() {
+    const modal = document.getElementById('comingSoonModal');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+  }
+</script>
+
+  </body>
+</html>

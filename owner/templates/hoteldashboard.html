@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AeroTrack Hotel Owner Dashboard</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+
+
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: '#3b82f6',
+secondary: '#64748b'
+},
+borderRadius: {
+'none': '0px',
+'sm': '4px',
+DEFAULT: '8px',
+'md': '12px',
+'lg': '16px',
+'xl': '20px',
+'2xl': '24px',
+'3xl': '32px',
+'full': '9999px',
+'button': '8px'
+}
+}
+}
+}
+</script>
+<style>
+:where([class^="ri-"])::before {
+content: "\f3c2";
+}
+</style>
+</head>
+<body class="bg-gray-50 font-sans">
+<div class="flex h-screen">
+<!-- Sidebar -->
+<div class="w-64 bg-white shadow-lg flex flex-col">
+<div class="p-6 border-b border-gray-200">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<i class="ri-hotel-line text-white"></i>
+</div>
+<span class="font-['Pacifico'] text-xl text-gray-800">AeroTrack</span>
+</div>
+</div>
+<nav class="flex-1 p-4">
+<ul class="space-y-2">
+<li>
+<a href="#" class="flex items-center gap-3 px-4 py-3 text-primary bg-blue-50 rounded-lg">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-dashboard-line"></i>
+</div>
+<span class="font-medium">Dashboard</span>
+</a>
+</li>
+<li>
+<a href="{% url 'manage_bookings' hotel.id %}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-calendar-line"></i>
+</div>
+<span>Bookings</span>
+</a>
+</li>
+<li>
+<a href="{% url 'manage_rooms' hotel.id %}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-home-line"></i>
+</div>
+<span>Rooms</span>
+</a>
+</li>
+<li>
+<a href="{% url 'manage_guests' hotel.id %}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-user-line"></i>
+</div>
+<span>Guests</span>
+</a>
+</li>
+
+
+</ul>
+</nav>
+<div class="p-4 border-t border-gray-200">
+<div class="flex items-center gap-3 px-4 py-3">
+<div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+<i class="ri-user-fill text-gray-600"></i>
+</div>
+<div class="flex-1">
+<div class="text-sm font-medium text-gray-800">{{hotel.hotel_name}}</div>
+<div class="text-xs text-gray-500">Hotel Owner</div>
+</div>
+<a href="/" class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600">
+<i class="ri-more-line"></i>
+</a>
+</div>
+</div>
+</div>
+<!-- Main Content -->
+<div class="flex-1 flex flex-col overflow-hidden">
+<!-- Header -->
+<header class="bg-white border-b border-gray-200 px-6 py-4">
+<div class="flex items-center justify-between">
+<div>
+<h1 class="text-2xl font-bold text-gray-800">{{hotel.hotel_name}}</h1>
+<p class="text-gray-600">Welcome back, {{hotel.email}}! Here's what's happening at your hotel today.</p>
+</div>
+<div class="flex items-center gap-4">
+
+<a href="{% url 'add_room_type' hotel.id %}" class="bg-primary text-white px-4 py-2 rounded-button whitespace-nowrap !rounded-button">
+<i class="ri-add-line mr-2"></i>
+Add Room Type
+</a>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<main class="flex-1 overflow-auto p-6">
+<!-- Stats Cards -->
+<div class="grid grid-cols-4 gap-6 mb-8">
+<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+<i class="ri-calendar-check-line text-blue-600 text-xl"></i>
+</div>
+
+</div>
+<div class="text-2xl font-bold text-gray-800 mb-1">{{total_bookings}}</div>
+<div class="text-gray-600 text-sm">Total Bookings</div>
+</div>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+<i class="ri-user-check-line text-green-600 text-xl"></i>
+</div>
+
+</div>
+<div class="text-2xl font-bold text-gray-800 mb-1">{{total_check_ins}}</div>
+<div class="text-gray-600 text-sm">Active Check-ins</div>
+</div>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+<i class="ri-close-circle-line text-red-600 text-xl"></i>
+</div>
+
+</div>
+<div class="text-2xl font-bold text-gray-800 mb-1">{{total_cancellations}}</div>
+<div class="text-gray-600 text-sm">Cancellations</div>
+</div>
+
+</div>
+<div class="grid grid-cols-3 gap-6 mb-8">
+<!-- Booking Trends Chart -->
+<div class="col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-semibold text-gray-800">Booking Trends</h3>
+
+</div>
+<div id="bookingChart" style="height: 300px;"></div>
+</div>
+<!-- Room Occupancy -->
+<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+<h3 class="text-lg font-semibold text-gray-800 mb-6">Room Occupancy</h3>
+<div id="occupancyChart" style="height: 300px;"></div>
+</div>
+</div>
+<div id="occupancy-data"
+     data-available="{{ available_rooms }}"
+     data-unavailable="{{ unavailable_rooms }}"
+     data-booked="{{ booked_rooms }}"
+     style="display: none;"></div>
+<!-- Recent Bookings Table -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-100">
+<div class="p-6 border-b border-gray-200">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-semibold text-gray-800">Recent Bookings</h3>
+<div class="flex items-center gap-3">
+<div class="relative">
+<input type="text" placeholder="Search bookings..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+<div class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center">
+<i class="ri-search-line text-gray-400"></i>
+</div>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
+<i class="ri-filter-line"></i>
+Filter
+</button>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full">
+<thead class="bg-gray-50">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guest</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-in/Out</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room Type</th>
+
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-200">
+  {% for booking in recent_bookings %}
+  <tr class="hover:bg-gray-50">
+    <!-- Guest Info -->
+    <td class="px-6 py-4 whitespace-nowrap">
+      <div class="flex items-center">
+        <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+          <i class="ri-user-fill text-gray-600"></i>
+        </div>
+        <div class="ml-4">
+          <div class="text-sm font-medium text-gray-900">{{ booking.guest.full_name }}</div>
+          <div class="text-sm text-gray-500">{{ booking.guest.email }}</div>
+        </div>
+      </div>
+    </td>
+
+    <!-- Check-in / Check-out -->
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+      <div>{{ booking.check_in|date:"M d, Y" }}</div>
+      <div class="text-gray-500">{{ booking.check_out|date:"M d, Y" }}</div>
+    </td>
+
+    <!-- Room Type -->
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+      {{ booking.room.room_type.name }}
+    </td>
+
+    <!-- Booking Status -->
+    <td class="px-6 py-4 whitespace-nowrap">
+      {% if booking.status == 'confirmed' %}
+        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Confirmed</span>
+      {% elif booking.status == 'cancelled' %}
+        <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Cancelled</span>
+      {% else %}
+        <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Pending</span>
+      {% endif %}
+    </td>
+
+    <!-- Payment Status -->
+    <td class="px-6 py-4 whitespace-nowrap">
+      
+      {% if booking.payment_status == 'Paid' %}
+        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-blue-800 rounded-full">Paid</span>
+      {% elif booking.payment_status == 'Failed' %}
+        <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Failed</span>
+      {% else %}
+        <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Pending</span>
+      {% endif %}
+    </td>
+
+    <!-- Actions -->
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+      <div class="flex items-center gap-2">
+        <a href="{% url 'delete_bookings' hotel.id booking.id %}" class="text-red-600 hover:text-red-900"
+           onclick="return confirm('Are you sure you want to delete this booking?');">
+          Delete
+        </a>
+      </div>
+    </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+      No recent bookings found.
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+
+
+
+</table>
+</div>
+<div class="px-6 py-4 border-t border-gray-200">
+<div class="flex items-center justify-between">
+<div class="text-center mt-4">
+    {% if has_previous %}
+        <a href="?start={{ start|add:"-limit" }}" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Previous</a>
+    {% endif %}
+
+    {% if has_next %}
+        <a href="?start={{ start|add:limit }}" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 ml-2">Next</a>
+    {% endif %}
+</div>
+
+</div>
+</div>
+</main>
+</div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    console.log("Chart script loaded");
+
+    const bookingLabels = JSON.parse('{{ booking_labels|escapejs }}');
+    const bookingData = JSON.parse('{{ booking_data|escapejs }}');
+
+    console.log("Labels:", bookingLabels);
+    console.log("Data:", bookingData);
+
+    const bookingChart = echarts.init(document.getElementById('bookingChart'));
+    bookingChart.setOption({
+        animation: false,
+        grid: { top: 10, right: 10, bottom: 30, left: 40 },
+        xAxis: {
+            type: 'category',
+            data: bookingLabels,
+            axisLine: { show: true },
+            axisTick: { show: true },
+            axisLabel: { color: '#6b7280' }
+        },
+        yAxis: {
+            type: 'value',
+            axisLine: { show: false },
+            axisTick: { show: false },
+            splitLine: { lineStyle: { color: '#f3f4f6' } },
+            axisLabel: { color: '#6b7280' }
+        },
+        series: [{
+            data: bookingData,
+            type: 'line',
+            smooth: true,
+            lineStyle: { color: '#3b82f6', width: 3 },
+            itemStyle: { color: '#3b82f6' },
+            areaStyle: {
+                color: {
+                    type: 'linear',
+                    x: 0, y: 0, x2: 0, y2: 1,
+                    colorStops: [
+                        { offset: 0, color: 'rgba(59, 130, 246, 0.3)' },
+                        { offset: 1, color: 'rgba(59, 130, 246, 0.05)' }
+                    ]
+                }
+            },
+            showSymbol: false
+        }],
+        tooltip: {
+            trigger: 'axis',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            borderColor: '#e5e7eb',
+            textStyle: { color: '#1f2937' }
+        }
+    });
+});
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const dataDiv = document.getElementById('occupancy-data');
+    const available = parseInt(dataDiv.dataset.available || 0);
+    const unavailable = parseInt(dataDiv.dataset.unavailable || 0);
+    const booked = parseInt(dataDiv.dataset.booked || 0);
+
+    const occupancyChart = echarts.init(document.getElementById('occupancyChart'));
+    const occupancyOption = {
+      animation: false,
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        borderColor: '#e5e7eb',
+        textStyle: { color: '#1f2937' }
+      },
+      legend: {
+        orient: 'horizontal',
+        left: 'left',
+        top: 10,
+        textStyle: {
+          color: '#1f2937'
+        }
+      },
+      series: [{
+        name: 'Room Status',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        label: { show: true, color: '#1f2937' },
+        emphasis: { scale: true },
+        data: [
+          { value: available, name: 'Available', itemStyle: { color: '#60a5fa' } },
+          { value: unavailable, name: 'Unavailable', itemStyle: { color: '#f87171' } },
+          { value: booked, name: 'Booked', itemStyle: { color: '#facc15' } }
+        ]
+      }]
+    };
+
+    occupancyChart.setOption(occupancyOption);
+  });
+</script>
+
+</body>
+</html>

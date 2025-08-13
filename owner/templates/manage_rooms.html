@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Rooms - {{ hotel.hotel_name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Optional: Custom scrollbar for better aesthetics */
+        body {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f7fafc; /* thumb and track color */
+        }
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+        body::-webkit-scrollbar-track {
+            background: #f7fafc; /* light-gray-50 */
+        }
+        body::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1; /* gray-300 */
+            border-radius: 20px;
+            border: 2px solid #f7fafc;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 sm:p-6 font-sans antialiased">
+
+    <div class="max-w-6xl mx-auto py-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight">
+                Manage Rooms <span class="text-blue-600">- {{ hotel.hotel_name }}</span>
+            </h2>
+            <button id="mobileMenuButton" class="sm:hidden p-2 rounded-md text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+            <a href="{% url 'add_rooms' hotel.id %}" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl shadow-lg hover:bg-blue-700 transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-blue-300">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Add New Room
+            </a>
+        </div>
+
+        <nav id="mobileMenu" class="hidden sm:hidden bg-white rounded-lg shadow-md mb-6 p-4">
+            <ul class="space-y-2">
+                <li><a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900">Rooms</a></li>
+                <li><a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900">Bookings</a></li>
+                <li><a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900">Settings</a></li>
+            </ul>
+        </nav>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for room in rooms %}
+            <div class="bg-white rounded-xl shadow-md p-6 transform hover:shadow-xl hover:scale-[1.01] transition-all duration-300 ease-in-out">
+                <div class="flex flex-col gap-5">
+                    <div class="flex-shrink-0 w-full">
+                        {% if room.images.all %}
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-48 overflow-hidden rounded-lg">
+                            {% for img in room.images.all|slice:":3" %}
+                                <img src="{{ img.image.url }}" alt="Room Image" class="rounded-md object-cover h-28 w-full border border-gray-200 shadow-sm">
+                            {% endfor %}
+                            {% if room.images.all|length > 3 %}
+                                <div class="col-span-full text-center text-sm text-gray-500 mt-2">
+                                    +{{ room.images.all|length|add:"-3" }} more images
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                            <div class="flex items-center justify-center h-28 bg-gray-50 rounded-lg text-gray-400 italic border border-dashed border-gray-300">
+                                No images available
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-extrabold text-gray-800 mb-2 leading-snug">{{ room.room_type.name }}</h3>
+                        <p class="text-gray-700 mb-3 text-lg">
+                            Price per Night: 
+                            <span class="font-bold text-green-700">₹{{ room.price_per_night }}</span>
+                        </p>
+                        <p class="text-sm text-gray-600 mb-4">
+                        Availability:
+                        {% if room.status == 'available' %}
+                            <span class="text-green-600 font-semibold px-2 py-0.5 bg-green-100 rounded-full text-xs">Available</span>
+                        {% elif room.status == 'booked' %}
+                            <span class="text-yellow-600 font-semibold px-2 py-0.5 bg-yellow-100 rounded-full text-xs">Booked</span>
+                        {% elif room.status == 'unavailable' %}
+                            <span class="text-red-600 font-semibold px-2 py-0.5 bg-red-100 rounded-full text-xs">Unavailable</span>
+                        {% else %}
+                            <span class="text-gray-600 font-semibold px-2 py-0.5 bg-gray-100 rounded-full text-xs">Unknown</span>
+                        {% endif %}
+                    </p>
+
+                        <div class="flex gap-4 text-base mt-4">
+                            <a href="{% url 'view_room' hotel.id room.id %}" class="inline-flex items-center text-gray-500 hover:text-blue-600 transition-colors duration-200" title="View Room Details">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                <span class="sr-only">View</span> </a>
+                            
+                            <a href="#" class="inline-flex items-center text-gray-500 hover:text-blue-600 transition-colors duration-200" title="Edit Room">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                <span class="sr-only">Edit</span>
+                            </a>
+                            
+                            <a href="{% url 'delete_room' hotel.id room.id %}" class="inline-flex items-center text-gray-500 hover:text-red-600 transition-colors duration-200" title="Delete Room">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                <span class="sr-only">Delete</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+                <div class="col-span-full bg-white rounded-xl shadow-md p-8 text-center">
+                    <p class="text-xl text-gray-600 font-medium">No rooms found for <span class="text-blue-600">{{ hotel.hotel_name }}</span>.</p>
+                    <p class="text-gray-500 mt-2">Click "Add New Room" to get started!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

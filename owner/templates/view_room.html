@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ room.room_type.name }} - Room Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Optional: Custom scrollbar for better aesthetics */
+        body {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f7fafc; /* thumb and track color */
+        }
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+        body::-webkit-scrollbar-track {
+            background: #f7fafc; /* light-gray-50 */
+        }
+        body::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1; /* gray-300 */
+            border-radius: 20px;
+            border: 2px solid #f7fafc;
+        }
+
+        /* Lightbox specific styles */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); /* Darker overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .lightbox-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Ensures entire image is visible */
+            border-radius: 0.75rem; /* rounded-xl */
+        }
+        .lightbox-nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 9999px; /* full rounded */
+            cursor: pointer;
+            font-size: 1.5rem;
+            line-height: 1;
+            transition: background-color 0.2s ease;
+            user-select: none; /* Prevent text selection */
+        }
+        .lightbox-nav-button:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+        .lightbox-nav-button.left {
+            left: 1rem;
+        }
+        .lightbox-nav-button.right {
+            right: 1rem;
+        }
+        .lightbox-close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: background-color 0.2s ease;
+        }
+        .lightbox-close-button:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen py-8 px-4 font-sans antialiased">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-10 border border-gray-200">
+        <div class="mb-8">
+            <a href="{% url 'hoteldashboard' hotel.id %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200 font-medium group">
+                <svg class="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Dashboard
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div class="order-first md:order-first">
+                {% if room.images.all %}
+                    <div class="relative w-full h-56 sm:h-72 md:h-80 rounded-xl overflow-hidden shadow-lg border border-gray-100 cursor-pointer" id="mainImageContainer">
+                        <img src="{{ room.images.first.image.url }}" alt="{{ room.room_type.name }} room main image" class="object-cover w-full h-full" id="mainRoomImage">
+                        {% if room.images.all|length > 1 %}
+                            <div class="absolute bottom-4 right-4 bg-black bg-opacity-60 text-white text-sm px-4 py-2 rounded-full flex items-center shadow-md">
+                                <svg class="w-4 h-4 mr-1 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                {{ room.images.all|length }} Photos
+                            </div>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="flex items-center justify-center h-56 sm:h-72 md:h-80 bg-gray-100 rounded-xl text-gray-400 italic border border-dashed border-gray-300">
+                        <svg class="w-16 h-16 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        No images available
+                    </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <h1 class="text-4xl font-extrabold text-gray-900 mb-3 leading-tight">{{ room.room_type.name }} Room</h1>
+                
+                <p class="text-2xl text-gray-700 mb-4">
+                    <span class="font-bold text-green-700">₹{{ room.price_per_night }}</span> <span class="text-base text-gray-500">per night</span>
+                </p>
+                
+                <p class="mb-6">
+                    <strong class="font-semibold text-gray-800">Status:</strong>
+                    {% if room.status == 'Available' %}
+                        <span class="inline-flex items-center px-4 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold ml-2">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Available
+                        </span>
+                        {% elif room.status == 'booked' %}
+                        <span class="inline-flex items-center px-4 py-1 bg-yellow-100 text-green-700 rounded-full text-sm font-semibold ml-2">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            booked
+                        </span>
+                            
+                    {% else %}
+                        <span class="inline-flex items-center px-4 py-1 bg-red-100 text-red-700 rounded-full text-sm font-semibold ml-2">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Unavailable
+                        </span>
+                    {% endif %}
+                </p>
+
+                <hr class="my-6 border-gray-200">
+
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Amenities</h3>
+                {% if room.amenities.all %}
+                    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-lg text-gray-700">
+                        {% for amenity in room.amenities.all %}
+                            <li class="flex items-center">
+                                <svg class="w-6 h-6 text-blue-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>{{ amenity.name }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-gray-500 italic text-lg">No amenities listed for this room.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if room.images.all %}
+            <div class="mt-12">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">More Photos</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {% for img in room.images.all %}
+                        <div class="rounded-xl overflow-hidden shadow-md border border-gray-100 aspect-w-16 aspect-h-9 cursor-pointer thumbnail-image" data-src="{{ img.image.url }}" data-index="{{ forloop.counter0 }}">
+                             <img src="{{ img.image.url }}" alt="Room Image {{ forloop.counter }}" class="object-cover w-full h-full transform hover:scale-105 transition-transform duration-300 ease-in-out">
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <p class="text-gray-500 italic">No additional images available for this room.</p>
+        {% endif %}
+    </div>
+
+    <div id="lightboxOverlay" class="lightbox-overlay">
+        <div class="lightbox-content">
+            <img src="" alt="Full size room image" id="lightboxImage">
+            <button id="lightboxPrev" class="lightbox-nav-button left">&lt;</button>
+            <button id="lightboxNext" class="lightbox-nav-button right">&gt;</button>
+            <button id="lightboxClose" class="lightbox-close-button">X</button>
+        </div>
+    </div>
+    <script id="room-image-urls" type="application/json">
+    {{ room.images.all|map(attribute="image.url")|list|json_script:"room-image-urls" }}
+</script>
+    
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            console.log("Image URLs from Django:", allImageUrls);
+            const mainRoomImage = document.getElementById('mainRoomImage');
+            const mainImageContainer = document.getElementById('mainImageContainer');
+            const thumbnailImages = document.querySelectorAll('.thumbnail-image');
+            const lightboxOverlay = document.getElementById('lightboxOverlay');
+            const lightboxImage = document.getElementById('lightboxImage');
+            const lightboxPrev = document.getElementById('lightboxPrev');
+            const lightboxNext = document.getElementById('lightboxNext');
+            const lightboxClose = document.getElementById('lightboxClose');
+
+            // Collect all image URLs for lightbox navigation
+            const allImageUrls = [];
+            {% for img in room.images.all %}
+                allImageUrls.push("{{ img.image.url|escapejs }}");
+            {% endfor %}
+            let currentImageIndex = 0;
+
+            // Function to update the main image
+            function updateMainImage(imageUrl) {
+                if (mainRoomImage) {
+                    mainRoomImage.src = imageUrl;
+                }
+            }
+
+            // Function to open the lightbox
+            function openLightbox(index) {
+                if (allImageUrls.length === 0) return; // No images to show
+
+                currentImageIndex = index;
+                lightboxImage.src = allImageUrls[currentImageIndex];
+                lightboxOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling background
+                updateLightboxNavButtons();
+            }
+
+            // Function to close the lightbox
+            function closeLightbox() {
+                lightboxOverlay.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+
+            // Function to navigate images in lightbox
+            function navigateLightbox(direction) {
+                if (direction === 'next') {
+                    currentImageIndex = (currentImageIndex + 1) % allImageUrls.length;
+                } else if (direction === 'prev') {
+                    currentImageIndex = (currentImageIndex - 1 + allImageUrls.length) % allImageUrls.length;
+                }
+                lightboxImage.src = allImageUrls[currentImageIndex];
+                updateLightboxNavButtons();
+            }
+
+            // Function to update visibility of nav buttons
+            function updateLightboxNavButtons() {
+                if (allImageUrls.length <= 1) {
+                    lightboxPrev.style.display = 'none';
+                    lightboxNext.style.display = 'none';
+                } else {
+                    lightboxPrev.style.display = 'block';
+                    lightboxNext.style.display = 'block';
+                }
+            }
+
+            // Event Listeners for Thumbnails
+            thumbnailImages.forEach(thumbnail => {
+                thumbnail.addEventListener('click', function() {
+                    const imageUrl = this.dataset.src;
+                    const imageIndex = parseInt(this.dataset.index);
+                    updateMainImage(imageUrl); // Update main image on click
+                    openLightbox(imageIndex); // Open lightbox with clicked image
+                });
+            });
+
+            // Event Listener for Main Image (to open lightbox)
+            if (mainImageContainer) {
+                mainImageContainer.addEventListener('click', function() {
+                    // Find the index of the current main image in allImageUrls
+                    const currentMainSrc = mainRoomImage.src;
+                    let index = allImageUrls.indexOf(currentMainSrc);
+                    // Fallback for cases where main image src might be a relative path or mismatched, try to find by alt text or initial first image.
+                    if (index === -1 && allImageUrls.length > 0) {
+                        index = 0; // Default to the first image if main image's src isn't perfectly matched
+                    }
+                    if (index !== -1) {
+                        openLightbox(index);
+                    }
+                });
+            }
+
+
+            // Lightbox Event Listeners
+            lightboxClose.addEventListener('click', closeLightbox);
+            lightboxPrev.addEventListener('click', () => navigateLightbox('prev'));
+            lightboxNext.addEventListener('click', () => navigateLightbox('next'));
+
+            // Close lightbox on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && lightboxOverlay.classList.contains('active')) {
+                    closeLightbox();
+                }
+            });
+
+            // Close lightbox if clicking outside the image (on the overlay itself)
+            lightboxOverlay.addEventListener('click', function(e) {
+                if (e.target === lightboxOverlay) {
+                    closeLightbox();
+                }
+            });
+
+            // Initialize button visibility on load
+            updateLightboxNavButtons();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ user.username }} - Hotel Bookings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes slide-in-right {
+      0% { transform: translateX(100%); opacity: 0; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+    .animate-slide-in-right {
+      animation: slide-in-right 0.4s ease forwards;
+    }
+  </style>
+  <script>
+  function openModal(bookingId) {
+    const url = "{% url 'cancel_hotel_bookings' 0 %}".replace(/0/, bookingId);
+    document.getElementById("cancelForm").action = url;
+    document.getElementById("cancelModal").classList.remove("hidden");
+  }
+
+  function closeModal() {
+    document.getElementById("cancelModal").classList.add("hidden");
+  }
+</script>
+
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Flash Messages -->
+  <div class="fixed top-4 right-4 z-50 space-y-2 w-full max-w-sm">
+    {% if messages %}
+      {% for message in messages %}
+        <div role="alert" class="flex items-center justify-between px-4 py-3 rounded shadow-lg text-sm font-medium transition-all duration-300 transform animate-slide-in-right opacity-100
+          {% if message.tags == 'success' %}
+            bg-green-500 text-white
+          {% elif message.tags == 'error' %}
+            bg-red-500 text-white
+          {% elif message.tags == 'warning' %}
+            bg-yellow-400 text-black
+          {% else %}
+            bg-blue-500 text-white
+          {% endif %}">
+          <div class="flex items-center">
+            <span>{{ message }}</span>
+          </div>
+          <button type="button" onclick="this.closest('[role=alert]').classList.add('opacity-0', 'scale-95'); setTimeout(() => this.closest('[role=alert]').remove(), 300);"
+            class="ml-auto text-white hover:opacity-70">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- Page Header -->
+  <div class="max-w-6xl mx-auto px-4 py-8">
+  <!-- Header and Back Button -->
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Hotel Bookings for {{ user.username }}</h1>
+    <a href="{% url 'user_landing' user.id %}" 
+       class="inline-flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium text-sm px-4 py-2 rounded-lg transition duration-200">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+      Back to Profile
+    </a>
+  </div>
+
+
+    <!-- UPCOMING BOOKINGS -->
+    <h2 class="text-2xl font-semibold text-blue-600 mb-4">Upcoming Bookings</h2>
+    {% if upcoming %}
+      <div class="grid gap-6 mb-10">
+        {% for booking in upcoming %}
+          <div class="bg-white rounded-lg shadow-md overflow-hidden flex">
+            {% if booking.room.images.first %}
+              <img src="{{ booking.room.images.first.image.url }}" class="w-48 h-48 object-cover" alt="Room Image">
+            {% else %}
+              <div class="w-48 h-48 bg-gray-200 flex items-center justify-center text-gray-500 text-sm">No Image</div>
+            {% endif %}
+            <div class="p-4 flex-1">
+              <h3 class="text-xl font-bold">{{ booking.room.hotel.hotel_name }}</h3>
+              <p class="text-gray-600 mb-1">Room Type: {{ booking.room.room_type }}</p>
+              <p>Check-in: {{ booking.check_in }} | Check-out: {{ booking.check_out }}</p>
+              <p>Total Amount: ₹{{ booking.total_amount }}</p>
+              <p class="mt-1">
+                Status:
+                <span class="inline-block px-2 py-1 text-sm rounded capitalize
+                  {% if booking.payment_status == 'Paid' %}
+                    bg-green-100 text-green-700
+                  {% elif booking.payment_status == 'Pending' %}
+                    bg-yellow-100 text-yellow-700
+                  {% else %}
+                    bg-red-100 text-red-700
+                  {% endif %}">
+                  {{ booking.payment_status }}
+                </span>
+              </p>
+
+              <!-- Guest Info -->
+              <div class="mt-3">
+                <p class="font-semibold">Guest(s):</p>
+                <ul class="list-disc ml-6 text-sm text-gray-700">
+                  {% for guest in booking.guest.all %}
+                    <li><b>{{ guest.full_name|default_if_none:''|title }}</b>
+                      {% if guest.gender == 'M' %}(Male){% elif guest.gender == 'F' %}(Female){% elif guest.gender == 'O' %}(Other){% endif %}
+                      - {{ guest.phone }}
+                    </li>
+                  {% empty %}
+                    <li class="text-gray-400">No guest details added.</li>
+                  {% endfor %}
+                </ul>
+              </div>
+
+              <!-- Amenities -->
+              <div class="mt-3 text-sm">
+                <span class="font-semibold">Amenities:</span>
+                {% for facility in booking.room.amenities.all %}
+                  <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs mr-1">{{ facility.name }}</span>
+                {% empty %}
+                  <span class="text-gray-500">None</span>
+                {% endfor %}
+              </div>
+
+              <!-- Cancel Button -->
+              {% if booking.payment_status != 'Failed' %}
+                <button onclick="openModal('{{ booking.id }}')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-medium mt-4">
+                  Cancel Booking
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-gray-500 mb-10">No upcoming bookings.</p>
+    {% endif %}
+
+    <!-- Cancel Confirmation Modal -->
+    <div id="cancelModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+      <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+        <h2 class="text-lg font-semibold mb-4">Cancel Booking</h2>
+        <p class="text-sm text-gray-700 mb-4">Are you sure you want to cancel this booking?</p>
+        <form id="cancelForm" method="POST">
+          {% csrf_token %}
+          <div class="flex justify-end gap-3">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">No</button>
+            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Yes, Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- PAST BOOKINGS -->
+    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Past Bookings</h2>
+    {% if past %}
+      <div class="grid gap-6">
+        {% for booking in past %}
+          <div class="bg-white rounded-lg shadow-md overflow-hidden flex">
+            {% if booking.room.images.first %}
+              <img src="{{ booking.room.images.first.image.url }}" class="w-48 h-48 object-cover" alt="Room Image">
+            {% else %}
+              <div class="w-48 h-48 bg-gray-200 flex items-center justify-center text-gray-500 text-sm">No Image</div>
+            {% endif %}
+            <div class="p-4 flex-1">
+              <h3 class="text-xl font-bold">{{ booking.room.hotel.hotel_name }}</h3>
+              <p class="text-gray-600 mb-1">Room Type: {{ booking.room.room_type }}</p>
+              <p>Check-in: {{ booking.check_in }} | Check-out: {{ booking.check_out }}</p>
+              <p>Total Amount: ₹{{ booking.total_amount }}</p>
+              <p class="mt-1">
+                Status:
+                <span class="inline-block px-2 py-1 text-sm rounded capitalize
+                  {% if booking.payment_status == 'Paid' %}
+                    bg-green-100 text-green-700
+                  {% elif booking.payment_status == 'Pending' %}
+                    bg-yellow-100 text-yellow-700
+                  {% else %}
+                    bg-red-100 text-red-700
+                  {% endif %}">
+                  {{ booking.payment_status }}
+                </span>
+              </p>
+
+              <!-- Guest Info -->
+              <div class="mt-3">
+                <p class="font-semibold mb-1">Guest(s):</p>
+                <ul class="list-disc ml-6 text-sm text-gray-700">
+                  {% for guest in booking.guest.all %}
+                    <li><b>{{ guest.full_name|default_if_none:''|title }}</b>
+                      {% if guest.gender == 'M' %}(Male){% elif guest.gender == 'F' %}(Female){% elif guest.gender == 'O' %}(Other){% endif %}
+                      - {{ guest.phone }}
+                    </li>
+                  {% empty %}
+                    <li class="text-gray-400">No guest details added.</li>
+                  {% endfor %}
+                </ul>
+              </div>
+
+              <!-- Amenities -->
+              <div class="mt-3 text-sm">
+                <span class="font-semibold">Amenities:</span>
+                {% for facility in booking.room.amenities.all %}
+                  <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs mr-1">{{ facility.name }}</span>
+                {% empty %}
+                  <span class="text-gray-500">None</span>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-gray-500">No past bookings.</p>
+    {% endif %}
+  </div>
+</body>
+</html>

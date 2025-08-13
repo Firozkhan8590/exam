@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroTrack Dashboard</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#4F46E5',secondary:'#10B981'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    keyframes: {
+                        'slide-in-right': {
+                            '0%': { transform: 'translateX(100%)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' },
+                        }
+                    },
+                    animation: {
+                        'slide-in-right': 'slide-in-right 0.5s ease-out forwards',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen">
+    <div class="fixed top-4 right-4 z-50 space-y-2 w-full max-w-sm">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="flex items-center justify-between px-4 py-3 rounded shadow-lg text-sm font-medium transition-all duration-300 transform animate-slide-in-right opacity-0
+                     {% if message.tags == 'success' %}
+                         bg-green-500 text-white
+                     {% elif message.tags == 'error' %}
+                         bg-red-500 text-white
+                     {% elif message.tags == 'warning' %}
+                         bg-yellow-500 text-black
+                     {% else %}
+                         bg-blue-500 text-white
+                     {% endif %}"
+                     role="alert">
+                    <div class="flex items-center">
+                        {% if message.tags == 'success' %}
+                            <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20" {% if message.tags == 'warning' %}style="color: black;"{% else %}style="color: white;"{% endif %}>
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        {% elif message.tags == 'error' %}
+                            <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20" {% if message.tags == 'warning' %}style="color: black;"{% else %}style="color: white;"{% endif %}>
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                        {% elif message.tags == 'warning' %}
+                            <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20" {% if message.tags == 'warning' %}style="color: black;"{% else %}style="color: white;"{% endif %}>
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.364 2.378-1.364 3.142 0L19.45 16.001a1.998 1.998 0 01-1.723 3H2.273a1.998 1.998 0 01-1.723-3L8.257 3.099zM10 11a1 1 0 100-2 1 1 0 000 2zm-1 4a1 1 0 102 0 1 1 0 00-2 0z" clip-rule="evenodd"></path>
+                            </svg>
+                        {% else %}
+                            <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20" {% if message.tags == 'warning' %}style="color: black;"{% else %}style="color: white;"{% endif %}>
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                        {% endif %}
+                        <span>{{ message }}</span>
+                    </div>
+                    <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-transparent rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-opacity-80 inline-flex items-center justify-center h-8 w-8
+                             {% if message.tags == 'warning' %}text-black{% else %}text-white{% endif %}"
+                            onclick="this.closest('[role=alert]').classList.add('opacity-0', 'scale-95'); setTimeout(() => this.closest('[role=alert]').remove(), 300);">
+                        <span class="sr-only">Dismiss</span>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 shadow-sm">
+            <div class="p-4 flex items-center gap-3">
+                <span class="font-['Pacifico'] text-primary text-2xl">AeroTrack</span>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4">
+                <div class="px-4 mb-2 text-xs font-medium text-gray-400 uppercase">Main</div>
+                <a href="#" class="flex items-center px-4 py-3 text-primary bg-blue-50 border-r-4 border-primary">
+                    <div class="w-5 h-5 flex items-center justify-center mr-3">
+                        <i class="ri-dashboard-line"></i>
+                    </div>
+                    <span class="font-medium">Dashboard</span>
+                </a>
+                <a href="{% url 'manage_flights' %}" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50">
+                    <div class="w-5 h-5 flex items-center justify-center mr-3">
+                        <i class="ri-flight-takeoff-line"></i>
+                    </div>
+                    <span>Flights</span>
+                </a>
+                <a href="{% url 'manage_hotels' %}" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50">
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                    <i class="ri-hotel-line"></i>
+                </div>
+                <span>Hotels</span>
+                </a>
+                </a>
+                <a href="{% url 'manage_user' %}" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50">
+                    <div class="w-5 h-5 flex items-center justify-center mr-3">
+                        <i class="ri-user-line"></i>
+                    </div>
+                    <span>Users</span>
+                </a>
+                <a href="{% url 'manage_owner' %}" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50">
+                    <div class="w-5 h-5 flex items-center justify-center mr-3">
+                        <i class="ri-user-star-line"></i>
+                    </div>
+                    <span>Owners</span>
+                </a>
+                
+                <div class="px-4 mt-6 mb-2 text-xs font-medium text-gray-400 uppercase">Settings</div>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50">
+                    <div class="w-5 h-5 flex items-center justify-center mr-3">
+                        <i class="ri-settings-line"></i>
+                    </div>
+                    <span>Settings</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50">
+                    <div class="w-5 h-5 flex items-center justify-center mr-3">
+                        <i class="ri-question-line"></i>
+                    </div>
+                    <span>Help & Support</span>
+                </a>
+            </nav>
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center">
+                   
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">{{user.username}}</p>
+                        <p class="text-xs text-gray-500">Admin</p>
+                    </div>
+                    <a href="{% url 'adminlogout' %}">
+                    <button class="ml-auto text-gray-500 hover:text-gray-700">
+                        <div class="w-5 h-5 flex items-center justify-center">
+                            <i class="ri-logout-box-line"></i></a>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Navigation -->
+            <header class="bg-white border-b border-gray-200 shadow-sm">
+                <div class="flex items-center justify-between px-6 h-16">
+                    <!-- Mobile menu button -->
+                    <button class="md:hidden text-gray-600 focus:outline-none">
+                        <div class="w-6 h-6 flex items-center justify-center">
+                            <i class="ri-menu-line"></i>
+                        </div>
+                    </button>
+                    
+                    <!-- Logo for mobile -->
+                    <div class="md:hidden font-['Pacifico'] text-primary text-xl">AeroTrack</div>
+                    <!-- Search Bar -->
+                    <div class="hidden md:flex items-center flex-1 max-w-xl mx-6">
+                        <div class="relative w-full">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                                <div class="w-5 h-5 flex items-center justify-center">
+                                    <i class="ri-search-line"></i>
+                                </div>
+                            </div>
+                            <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5 focus:ring-primary focus:border-primary" placeholder="Search flights, hotels, users...">
+                        </div>
+                    </div>
+
+                    <!-- Right Nav Items -->
+                    <div class="flex items-center space-x-4">
+                        <a href="{% url 'admin_notification' %}">
+    <button class="text-gray-500 hover:text-gray-700 relative">
+        <div class="w-6 h-6 flex items-center justify-center">
+            <i class="ri-notification-3-line text-xl"></i>
+        </div>
+        {% if unread_count > 0 %}
+        <span
+            class="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
+            {{ unread_count }}
+        </span>
+        {% endif %}
+    </button>
+    </a>
+
+
+                        <button class="text-gray-500 hover:text-gray-700">
+                            <div class="w-6 h-6 flex items-center justify-center">
+                                <i class="ri-mail-line"></i>
+                            </div>
+                        </button>
+                        <div class="hidden md:block border-l border-gray-300 h-6 mx-2"></div>
+                        <div class="hidden md:flex items-center">
+                            <img src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20young%20business%20man%20with%20short%20hair%2C%20high%20quality%2C%20studio%20lighting%2C%20professional%20photo&width=100&height=100&seq=1&orientation=squarish" alt="Profile" class="w-8 h-8 rounded-full object-cover">
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+
+
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
+                <div class="max-w-7xl mx-auto">
+                    <!-- Dashboard Header -->
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+                            <p class="mt-1 text-sm text-gray-500">Welcome back,{{user.username}}. Here's what's happening with your platform today.</p>
+                        </div>
+                        <div class="mt-4 md:mt-0 flex space-x-3">
+                            <div class="relative">
+                                <button class="flex items-center bg-white border border-gray-300 rounded-button px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 whitespace-nowrap">
+                                    <div class="w-4 h-4 flex items-center justify-center mr-2">
+                                        <i class="ri-calendar-line"></i>
+                                    </div>
+                                    <span>{{ today|date:"F d, Y" }}</span>
+
+                                </button>
+                            </div>
+                            <button class="bg-blue-600 text-white rounded-button px-4 py-2 text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary whitespace-nowrap">
+                                <div class="w-4 h-4 flex items-center justify-center mr-2 inline-block">
+                                    <i class="ri-download-line"></i>
+                                </div>
+                                <span>Export Report</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <!-- Total Users Card -->
+                        <div class="stat-card bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
+                            <div class="p-5">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-blue-100 rounded-lg p-3">
+                                        <div class="w-8 h-8 flex items-center justify-center text-primary">
+                                            <i class="ri-user-line ri-lg"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ml-5">
+                                        <p class="text-sm font-medium text-gray-500">Total Users</p>
+                                        <p class="text-2xl font-semibold text-gray-900">{{total_users}}</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex items-center">
+                                    <span class="text-green-500 text-sm font-medium flex items-center">
+                                        <div class="w-4 h-4 flex items-center justify-center mr-1">
+                                            <i class="ri-arrow-up-line"></i>
+                                        </div>
+                                        12.5%
+                                    </span>
+                                    <span class="ml-2 text-xs text-gray-500">vs last month</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Owners Card -->
+                        <div class="stat-card bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
+                            <div class="p-5">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-green-100 rounded-lg p-3">
+                                        <div class="w-8 h-8 flex items-center justify-center text-secondary">
+                                            <i class="ri-user-star-line ri-lg"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ml-5">
+                                        <p class="text-sm font-medium text-gray-500">Total Owners</p>
+                                        <p class="text-2xl font-semibold text-gray-900">{{total_owners}}</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex items-center">
+                                    <span class="text-green-500 text-sm font-medium flex items-center">
+                                        <div class="w-4 h-4 flex items-center justify-center mr-1">
+                                            <i class="ri-arrow-up-line"></i>
+                                        </div>
+                                        8.2%
+                                    </span>
+                                    <span class="ml-2 text-xs text-gray-500">vs last month</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Hotels Card -->
+                        <div class="stat-card bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
+                            <div class="p-5">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-yellow-100 rounded-lg p-3">
+                                        <div class="w-8 h-8 flex items-center justify-center text-yellow-500">
+                                            <i class="ri-hotel-line ri-lg"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ml-5">
+                                        <p class="text-sm font-medium text-gray-500">Total Hotels</p>
+                                        <p class="text-2xl font-semibold text-gray-900">{{total_hotels}}</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex items-center">
+                                    <span class="text-green-500 text-sm font-medium flex items-center">
+                                        <div class="w-4 h-4 flex items-center justify-center mr-1">
+                                            <i class="ri-arrow-up-line"></i>
+                                        </div>
+                                        5.3%
+                                    </span>
+                                    <span class="ml-2 text-xs text-gray-500">vs last month</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Flights Card -->
+                        <div class="stat-card bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
+                            <div class="p-5">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-red-100 rounded-lg p-3">
+                                        <div class="w-8 h-8 flex items-center justify-center text-red-500">
+                                            <i class="ri-flight-takeoff-line ri-lg"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ml-5">
+                                        <p class="text-sm font-medium text-gray-500">Total Flights</p>
+                                        <p class="text-2xl font-semibold text-gray-900">{{total_flights}}</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex items-center">
+                                    <span class="text-red-500 text-sm font-medium flex items-center">
+                                        <div class="w-4 h-4 flex items-center justify-center mr-1">
+                                            <i class="ri-arrow-down-line"></i>
+                                        </div>
+                                        2.8%
+                                    </span>
+                                    <span class="ml-2 text-xs text-gray-500">vs last month</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Charts Section -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <!-- Monthly Bookings Chart -->
+                        <div class="bg-white rounded-lg shadow-md p-5 border border-gray-100">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-semibold text-gray-900">Monthly Bookings</h2>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200 whitespace-nowrap">Last 30 Days</button>
+                                    <button class="px-3 py-1 text-xs font-medium text-gray-500 hover:bg-gray-100 rounded-full whitespace-nowrap">Last Quarter</button>
+                                    <button class="px-3 py-1 text-xs font-medium text-gray-500 hover:bg-gray-100 rounded-full whitespace-nowrap">Year to Date</button>
+                                </div>
+                            </div>
+                            <div id="monthlyBookingsChart" class="w-full h-80"></div>
+                        </div>
+
+                        <!-- Data Distribution Chart -->
+                        <div class="bg-white rounded-lg shadow-md p-5 border border-gray-100">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-semibold text-gray-900">Data Distribution</h2>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200 whitespace-nowrap">By Category</button>
+                                    <button class="px-3 py-1 text-xs font-medium text-gray-500 hover:bg-gray-100 rounded-full whitespace-nowrap">By Region</button>
+                                </div>
+                            </div>
+                            <div id="dataDistributionChart" class="w-full h-80"></div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                  <h2 class="text-lg font-semibold text-gray-900 mb-4">✈️ Pending Flight Owner Approvals</h2>
+                    <div class="overflow-x-auto mb-10">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Owner</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Company</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">License</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Certificate</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID Proof</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        {% for owner in pending_owners %}
+                        <tr>
+                            <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-gray-900">{{ owner.fullname }}</div>
+                            <div class="text-sm text-gray-500">{{ owner.email }}</div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900">{{ owner.Companyname }}</td>
+                            <td class="px-6 py-4 text-sm">
+                            <a href="{{ owner.airline_license.url }}" target="_blank" class="text-blue-600 hover:underline">View License</a>
+                            </td>
+                            <td class="px-6 py-4 text-sm">
+                            <a href="{{ owner.registration_certificate.url }}" target="_blank" class="text-blue-600 hover:underline">View Certificate</a>
+                            </td>
+                            <td class="px-6 py-4 text-sm">
+                            <a href="{{ owner.government_id_proof.url }}" target="_blank" class="text-blue-600 hover:underline">View ID</a>
+                            </td>
+                            <td class="px-6 py-4">
+                            <form method="POST" action="{% url 'approve_owner' owner.id %}">
+                                {% csrf_token %}
+                                <button class="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-1 rounded">Approve</button>
+                            </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">No pending owners.</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+    <script>
+    const totalUsers = parseInt("{{ total_users|default:0 }}") || 0;
+    const totalOwners = parseInt("{{ total_owners|default:0 }}") || 0;
+    const totalHotels = parseInt("{{ total_hotels|default:0 }}") || 0;
+    const totalFlights = parseInt("{{ total_flights|default:0 }}") || 0;
+
+    const dataDistributionChart = echarts.init(document.getElementById('dataDistributionChart'));
+    dataDistributionChart.setOption({
+        animation: false,
+        tooltip: { trigger: 'item' },
+        legend: {
+            orient: 'vertical',
+            right: '5%',
+            top: 'center'
+        },
+        series: [{
+            name: 'Data Distribution',
+            type: 'pie',
+            radius: ['40%', '70%'],
+            center: ['40%', '50%'],
+            avoidLabelOverlap: false,
+            itemStyle: {
+                borderRadius: 8,
+                borderColor: '#fff',
+                borderWidth: 2
+            },
+            label: { show: false },
+            emphasis: {
+                label: { show: true, fontSize: 14, fontWeight: 'bold' }
+            },
+            labelLine: { show: false },
+            data: [
+                { value: totalUsers, name: 'Users', itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
+                { value: totalOwners, name: 'Owners', itemStyle: { color: 'rgba(141, 211, 199, 1)' } },
+                { value: totalHotels, name: 'Hotels', itemStyle: { color: 'rgba(251, 191, 114, 1)' } },
+                { value: totalFlights, name: 'Flights', itemStyle: { color: 'rgba(252, 141, 98, 1)' } }
+            ]
+        }]
+    });
+
+    // Responsive Resize
+    window.addEventListener('resize', function () {
+        dataDistributionChart.resize();
+        if (typeof monthlyBookingsChart !== 'undefined') {
+            monthlyBookingsChart.resize();
+        }
+    });
+
+    // Toast Message Auto-Hide
+    setTimeout(() => {
+        document.querySelectorAll('.toast-message').forEach(el => {
+            el.style.transition = 'opacity 0.5s ease';
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 500);
+        });
+    }, 3000);
+</script>
+
+   <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Monthly Bookings Line Chart
+        const monthlyBookingsChart = echarts.init(document.getElementById('monthlyBookingsChart'));
+        monthlyBookingsChart.setOption({
+            animation: false,
+            tooltip: { trigger: 'axis' },
+            grid: { left: '3%', right: '4%', bottom: '3%', top: '3%', containLabel: true },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+            yAxis: { type: 'value' },
+            series: [
+                {
+                    name: 'Hotel Bookings',
+                    type: 'line',
+                    smooth: true,
+                    data: [320, 332, 301, 334, 390, 330, 320, 350, 360, 380, 390, 410]
+                },
+                {
+                    name: 'Flight Bookings',
+                    type: 'line',
+                    smooth: true,
+                    data: [220, 182, 191, 234, 290, 330, 310, 320, 330, 350, 370, 390]
+                }
+            ]
+        });
+    });
+</script>
+
+</body>
+</html>

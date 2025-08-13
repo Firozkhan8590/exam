@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refund Request Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.4rem 0.9rem;
+            border-radius: 9999px; /* Fully rounded corners */
+            font-weight: 700;
+            font-size: 0.9em;
+            text-transform: capitalize;
+            letter-spacing: 0.025em;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06); /* Subtle inner and outer shadow */
+            transition: all 0.2s ease-in-out;
+        }
+        .status-pending {
+            background-color: #fce6a8; /* Light orange-yellow */
+            color: #b7791f; /* Darker orange-yellow */
+        }
+        .status-approved {
+            background-color: #a7f3d0; /* Light green */
+            color: #065f46; /* Darker green */
+        }
+        .status-rejected {
+            background-color: #fecaca; /* Light red */
+            color: #991b1b; /* Darker red */
+        }
+        .status-refunded {
+            background-color: #bfdbfe; /* Light blue */
+            color: #1e40af; /* Darker blue */
+        }
+
+        /* Glassmorphism effect for the card */
+        .glass-card {
+            background: rgba(45, 55, 72, 0.6); /* Slightly transparent dark background */
+            backdrop-filter: blur(15px) saturate(180%); /* Frosted glass effect */
+            -webkit-backdrop-filter: blur(15px) saturate(180%);
+            border: 1px solid rgba(107, 114, 128, 0.4); /* Subtle transparent border */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); /* Stronger, diffused shadow */
+            transition: all 0.3s ease-in-out;
+        }
+        .glass-card:hover {
+            border-color: rgba(107, 114, 128, 0.6); /* Border gets slightly more opaque on hover */
+        }
+
+        /* Animated background */
+        body {
+            background: linear-gradient(-45deg, #1f2937, #111827, #1f2937, #374151);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Button Hover Effects */
+        .btn-action {
+            transform: translateY(0);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-action:hover {
+            transform: translateY(-2px); /* Lift effect */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); /* Stronger shadow on hover */
+            filter: brightness(110%); /* Slightly brighter */
+        }
+        .btn-back {
+            background-color: rgba(107, 114, 128, 0.2); /* Transparent gray background */
+            color: #a7d9f2; /* Light blue text */
+            border: 1px solid rgba(107, 114, 128, 0.5); /* Subtle border */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-back:hover {
+            background-color: rgba(107, 114, 128, 0.3); /* Slightly more opaque on hover */
+            border-color: rgba(107, 114, 128, 0.7);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Keyframe for blob animation */
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen p-8 sm:p-10 flex items-center justify-center relative overflow-hidden">
+
+    <div class="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 bg-blue-600 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob"></div>
+    <div class="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 bg-purple-600 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+
+    <div class="relative z-10 w-full max-w-2xl p-8 sm:p-10 rounded-3xl glass-card">
+        <div class="flex items-center mb-8 border-b border-gray-700/50 pb-6">
+            <svg class="w-12 h-12 text-blue-400 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.001 12.001 0 002.92 11.644c-.035.038-.06.07-.09.1L.82 17.519A2.75 2.75 0 003.116 21H20.884a2.75 2.75 0 002.296-3.481l-2.01-5.776a2.002 2.002 0 00-.09-.1c-.487-2.617-1.396-5.06-2.695-7.398z"></path>
+            </svg>
+            <h2 class="text-4xl font-extrabold text-white leading-tight">Refund Request <span class="text-blue-400">#{{ refund.booking.id }}</span></h2>
+        </div>
+
+        <div class="space-y-6 text-lg">
+            <p><strong class="font-semibold text-gray-400">Requested By:</strong> <span class="text-gray-200">{{ refund.user }}</span></p>
+            <p><strong class="font-semibold text-gray-400">For Booking:</strong> <span class="text-gray-200">#{{ refund.booking.id }}</span></p>
+            <p><strong class="font-semibold text-gray-400">Reason for Refund:</strong> <span class="text-gray-200">{{ refund.description }}</span></p>
+            <p>
+                <strong class="font-semibold text-gray-400">Current Status:</strong>
+                <span class="status-badge status-{{ refund.status|lower }}">
+                    {{ refund.status }}
+                </span>
+            </p>
+            <p><strong class="font-semibold text-gray-400">Request Date:</strong> <span class="text-gray-200">{{ refund.request_date }}</span></p>
+
+            {% if refund.processed_date %}
+                <p><strong class="font-semibold text-gray-400">Processed Date:</strong> <span class="text-gray-200">{{ refund.processed_date }}</span></p>
+            {% endif %}
+        </div>
+
+        <div class="mt-10 pt-6 border-t border-gray-700/50 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
+            {# Action Buttons #}
+           {% if refund.status|lower == "pending" %}
+<form method="post" action="{% url 'update_refund_request' refund.id passenger.id %}" class="flex-1">
+    {% csrf_token %}
+    <input type="hidden" name="status" value="approved">
+    <button type="submit"
+        class="btn-action w-full bg-green-500 px-7 py-3 rounded-xl text-white font-bold text-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75">
+        Approve Request
+    </button>
+</form>
+
+<form method="post" action="{% url 'update_refund_request' refund.id passenger.id %}" class="flex-1">
+    {% csrf_token %}
+    <input type="hidden" name="status" value="rejected">
+    <button type="submit"
+        class="btn-action w-full bg-red-500 px-7 py-3 rounded-xl text-white font-bold text-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75">
+        Reject Request
+    </button>
+</form>
+{% endif %}
+
+            {% if refund.status|lower == "approved" %}
+                <a href="#" class="btn-action flex-1 text-center bg-blue-500 px-7 py-3 rounded-xl text-white font-bold text-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
+                    Mark as Refunded
+                </a>
+            {% endif %}
+
+            {# Back to Dashboard Button #}
+            <a href="{% url 'admindashboard' %}" class="btn-action btn-back flex-1 text-center px-7 py-3 rounded-xl font-bold text-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 flex items-center justify-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</body>
+</html>

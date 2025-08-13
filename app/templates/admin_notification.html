@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Notifications</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen text-white">
+
+    <div class="max-w-3xl mx-auto my-10 p-8 bg-gray-800 shadow-xl rounded-xl border border-gray-700"> {# Reduced overall size #}
+        <h2 class="text-3xl font-extrabold text-white mb-6 pb-3 border-b border-gray-700 flex items-center"> {# Slightly smaller heading #}
+            <span class="mr-3 text-blue-400">✨</span> Administrator Notifications
+        </h2>
+
+        {% if notifications %}
+            <ul class="space-y-3"> {# Further reduced spacing between cards #}
+                {% for note in notifications %}
+                    <li class="p-3 rounded-lg transition-all duration-300 ease-in-out cursor-pointer {# Reduced internal padding #}
+                        {% if note.is_read %}
+                            bg-gray-800 border-l-4 border-gray-700 text-gray-400 hover:bg-gray-700 hover:shadow-md
+                        {% else %}
+                            bg-gray-700 border-l-4 border-blue-500 text-white font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5
+                        {% endif %}">
+                        
+                        <div class="flex flex-col">
+                            {% if note.refund %}
+                                <a href="{%  url 'admin_refund_view' note.refund.id %}" class="text-base text-blue-400 hover:text-blue-300 hover:underline">
+                                    {{ note.message }}
+                                </a>
+                            {% else %}
+                                <p class="text-base 
+                                    {% if note.is_read %}text-gray-300{% else %}text-white{% endif %}">
+                                    {{ note.message }}
+                                </p>
+                            {% endif %}
+                            <p class="text-xs mt-1 
+                                {% if note.is_read %}text-gray-500{% else %}text-blue-300{% endif %}"> {# Slightly smaller timestamp #}
+                                {{ note.timestamp|date:"M d, Y h:i A" }}
+                            </p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="py-8 text-center text-gray-400 bg-gray-800 rounded-lg border border-gray-700"> {# Reduced padding here too #}
+                <p class="text-base">All caught up! No notifications at this time.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>

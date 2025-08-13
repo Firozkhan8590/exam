@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Search</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#4f46e5',secondary:'#f97316'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        .custom-shadow {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .airline-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3f4f6;
+        }
+        .flight-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .flight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        .custom-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .custom-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e5e7eb;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4f46e5;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="/" class="text-2xl font-['Pacifico'] text-primary"></a>
+            <nav class="hidden md:flex items-center space-x-6">
+                <a href="{% url 'user_landing' user.id %}" class="text-gray-700 hover:text-primary font-medium">Home</a>
+                <a href="#" class="text-primary font-medium">Flights</a>
+                <a href="{% url 'hotel_search' user.id %}" class="text-gray-700 hover:text-primary font-medium">Hotels</a>
+                
+            </nav>
+            
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <section class="mb-8">
+            <div class="bg-white rounded-lg custom-shadow p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-semibold text-gray-800">Find Your Flight</h2>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600">Round Trip</span>
+                        <label class="custom-switch">
+                            <input type="checkbox" id="tripTypeToggle">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="text-sm text-gray-600">One Way</span>
+                    </div>
+                </div>
+
+                <form action="{% url 'flighthome' user.id %}" method="POST" class="space-y-6">
+                  {% csrf_token %}
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="from" class="block text-sm font-medium text-gray-700">From</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="ri-flight-takeoff-line text-gray-400"></i>
+                                </div>
+                                <input type="text" id="from" name="source" placeholder="Departure Airport" class="w-full pl-10 pr-4 py-3 border-none bg-gray-50 rounded focus:ring-2 focus:ring-primary focus:bg-white transition-all" required>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="to" class="block text-sm font-medium text-gray-700">To</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="ri-flight-land-line text-gray-400"></i>
+                                </div>
+                                <input type="text" id="to" name="destination" placeholder="Arrival Airport" class="w-full pl-10 pr-4 py-3 border-none bg-gray-50 rounded focus:ring-2 focus:ring-primary focus:bg-white transition-all" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-2">
+                            <label for="departure_date" class="block text-sm font-medium text-gray-700">Departure Date</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="ri-calendar-line text-gray-400"></i>
+                                </div>
+                                <input type="date" id="departure_date" name="departure_date" class="w-full pl-10 pr-4 py-3 border-none bg-gray-50 rounded focus:ring-2 focus:ring-primary focus:bg-white transition-all" required>
+                            </div>
+                        </div>
+                        <div class="space-y-2" id="returnDateContainer">
+                            <label for="return_date" class="block text-sm font-medium text-gray-700">Return Date</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="ri-calendar-line text-gray-400"></i>
+                                </div>
+                                <input type="date" id="return_date" name="return_date" class="w-full pl-10 pr-4 py-3 border-none bg-gray-50 rounded focus:ring-2 focus:ring-primary focus:bg-white transition-all">
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="passengers" class="block text-sm font-medium text-gray-700">Passengers</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="ri-user-line text-gray-400"></i>
+                                </div>
+                                <input type="number" id="passengers" name="passengers" min="1" max="10" value="1" class="w-full pl-10 pr-4 py-3 border-none bg-gray-50 rounded focus:ring-2 focus:ring-primary focus:bg-white transition-all">
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                    <div class="flex flex-col">
+                                        <button type="button" class="increment-btn text-gray-500 hover:text-gray-700 focus:outline-none" data-input="passengers">
+                                            <i class="ri-arrow-up-s-line"></i>
+                                        </button>
+                                        <button type="button" class="decrement-btn text-gray-500 hover:text-gray-700 focus:outline-none" data-input="passengers">
+                                            <i class="ri-arrow-down-s-line"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                        <div class="flex items-center space-x-6">
+                            <div class="flex items-center">
+                                <input id="direct_flights" name="direct_flights" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                <label for="direct_flights" class="ml-2 block text-sm text-gray-700">Direct flights only</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="flexible_dates" name="flexible_dates" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                <label for="flexible_dates" class="ml-2 block text-sm text-gray-700">Flexible dates (±3 days)</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-8 py-3 !rounded-button whitespace-nowrap font-medium transition-colors flex items-center justify-center">
+                            <i class="ri-search-line mr-2"></i>
+                            Search Flights
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <div class="bg-white rounded-lg custom-shadow p-6">
+              {% if flights is not None %}
+
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Available Flights</h2>
+                <p>Total found: {{ flights|length }}</p>
+
+                
+                
+                <div id="flightsContainer" class="space-y-4">
+                  {% for flight in flights %}
+                    <!-- Flight 1 -->
+                    <div class="flight-card bg-white border border-gray-100 rounded-lg p-4 custom-shadow">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                            <div class="flex items-center mb-4 md:mb-0">
+                                <div class="airline-logo mr-4">
+                                    <i class="ri-flight-line ri-lg text-primary"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500">{{flight.aircraft_type.owner.Companyname}}</div>
+                                    <div class="text-sm font-medium">{{flight.flight_number}}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex-1 flex flex-col md:flex-row md:items-center md:justify-between px-4 md:px-8">
+                                <div class="text-center mb-4 md:mb-0">
+                                    <div class="text-xl font-semibold">{{flight.departure_time}}</div>
+                                    <div class="text-sm text-gray-500">LHR</div>
+                                    <div class="text-xs">{{flight.departure_airport}}</div>
+                                </div>
+                                
+                                <div class="flex flex-col items-center mb-4 md:mb-0">
+                                    <div class="text-xs text-gray-500">{{flight.duration}}</div>
+                                    <div class="w-24 md:w-32 h-px bg-gray-300 my-2 relative">
+                                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary"></div>
+                                    </div>
+                                    <div class="text-xs text-gray-500">Direct</div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <div class="text-xl font-semibold">{{flight.arrival_time}}</div>
+                                    <div class="text-sm text-gray-500">CDG</div>
+                                    <div class="text-xs">{{flight.arrival_airport}}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col items-end mt-4 md:mt-0">
+                                <div class="text-2xl font-bold text-primary mb-2">{{flight.business_per_ticket}}</div>
+                                <div class="text-2xl font-bold text-primary mb-2">{{flight.economy_per_ticket}}</div>
+                                <a href="{% url 'seating_layout' user.id flight.id flight.aircraft_type.id %}" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 !rounded-button whitespace-nowrap font-medium transition-colors text-sm">Select Seat</a>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- Flight 2 -->
+                    
+                    
+                    <!-- Flight 3 -->
+                    
+                </div>
+                {% endif %}
+                {% if flights is not None and not flights %}
+                <div id="noFlightsMessage" class="hidden py-16 flex flex-col items-center justify-center">
+                    <div class="w-16 h-16 flex items-center justify-center bg-gray-100 rounded-full mb-4">
+                        <i class="ri-flight-line ri-xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-xl font-medium text-gray-700 mb-2">No flights found</h3>
+                    <p class="text-gray-500 text-center max-w-md">We couldn't find any flights matching your search criteria. Please try different dates or destinations.</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section>
+            
+            <div class="bg-white rounded-lg custom-shadow p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Live Real-Time Flights</h2>
+                {% if real_flights %}
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Airline</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Flight</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">To</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrival</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+    {% for flight in real_flights %}
+    <tr>
+        <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+                <div class="airline-logo mr-3">
+                    {% if flight.airline.logo %}
+                        <img src="#" alt="{{ flight.airline.name }}" class="h-6 w-auto">
+                    {% else %}
+                        <i class="ri-flight-line text-primary"></i>
+                    {% endif %}
+                </div>
+                <div class="text-sm font-medium text-gray-900">{{ flight.airline.name }}</div>
+            </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ flight.flight.iata }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ flight.departure.airport }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ flight.arrival.airport }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ flight.departure.scheduled|date:"H:i" }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ flight.arrival.scheduled|date:"H:i" }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                {% if flight.flight_status == 'scheduled' %}
+                    bg-green-100 text-green-800
+                {% elif flight.flight_status == 'delayed' %}
+                    bg-yellow-100 text-yellow-800
+                {% elif flight.flight_status == 'cancelled' %}
+                    bg-red-100 text-red-800
+                {% elif flight.flight_status == 'landed' %}
+                    bg-purple-100 text-purple-800
+                {% else %}
+                    bg-blue-100 text-blue-800
+                {% endif %}">
+                {{ flight.flight_status|title }}
+            </span>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+
+
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+            
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-['Pacifico'] mb-4">AeroTrack</h3>
+                    <p class="text-gray-400 mb-4">Find the best flights at the best prices, all in one place.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center">
+                            <i class="ri-facebook-fill"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center">
+                            <i class="ri-twitter-fill"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center">
+                            <i class="ri-instagram-fill"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Press</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Partners</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Subscribe to our newsletter</h4>
+                    <p class="text-gray-400 mb-4">Get the latest updates and offers straight to your inbox.</p>
+                    <form class="flex">
+                        <input type="email" placeholder="Your email address" class="px-4 py-2 w-full bg-gray-700 border-none rounded-l focus:outline-none focus:ring-2 focus:ring-primary">
+                        <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 !rounded-r-button whitespace-nowrap font-medium transition-colors">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row md:justify-between md:items-center">
+                <p class="text-gray-400 text-sm mb-4 md:mb-0">© 2025 SkyWay. All rights reserved.</p>
+                <div class="flex space-x-4">
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <i class="ri-visa-fill ri-lg text-gray-400"></i>
+                    </div>
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <i class="ri-mastercard-fill ri-lg text-gray-400"></i>
+                    </div>
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <i class="ri-paypal-fill ri-lg text-gray-400"></i>
+                    </div>
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <i class="ri-apple-fill ri-lg text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script id="tripTypeToggleScript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const tripTypeToggle = document.getElementById('tripTypeToggle');
+            const returnDateContainer = document.getElementById('returnDateContainer');
+            
+            tripTypeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    returnDateContainer.style.display = 'none';
+                } else {
+                    returnDateContainer.style.display = 'block';
+                }
+            });
+        });
+    </script>
+
+    <script id="passengerCounterScript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const incrementBtns = document.querySelectorAll('.increment-btn');
+            const decrementBtns = document.querySelectorAll('.decrement-btn');
+            
+            incrementBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const inputId = this.getAttribute('data-input');
+                    const input = document.getElementById(inputId);
+                    const currentValue = parseInt(input.value);
+                    const max = parseInt(input.getAttribute('max'));
+                    
+                    if (currentValue < max) {
+                        input.value = currentValue + 1;
+                    }
+                });
+            });
+            
+            decrementBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const inputId = this.getAttribute('data-input');
+                    const input = document.getElementById(inputId);
+                    const currentValue = parseInt(input.value);
+                    const min = parseInt(input.getAttribute('min'));
+                    
+                    if (currentValue > min) {
+                        input.value = currentValue - 1;
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script id="airportAutocompleteScript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample airport data for autocomplete
+            const airports = [
+                { code: 'LHR', name: 'London Heathrow Airport', city: 'London', country: 'United Kingdom' },
+                { code: 'LGW', name: 'London Gatwick Airport', city: 'London', country: 'United Kingdom' },
+                { code: 'CDG', name: 'Charles de Gaulle Airport', city: 'Paris', country: 'France' },
+                { code: 'ORY', name: 'Paris Orly Airport', city: 'Paris', country: 'France' },
+                { code: 'FRA', name: 'Frankfurt Airport', city: 'Frankfurt', country: 'Germany' },
+                { code: 'AMS', name: 'Amsterdam Schiphol Airport', city: 'Amsterdam', country: 'Netherlands' },
+                { code: 'MAD', name: 'Madrid Barajas Airport', city: 'Madrid', country: 'Spain' },
+                { code: 'FCO', name: 'Rome Fiumicino Airport', city: 'Rome', country: 'Italy' },
+                { code: 'JFK', name: 'John F. Kennedy International Airport', city: 'New York', country: 'United States' },
+                { code: 'LAX', name: 'Los Angeles International Airport', city: 'Los Angeles', country: 'United States' }
+            ];
+            
+            // Simplified autocomplete functionality
+            const fromInput = document.getElementById('from');
+            const toInput = document.getElementById('to');
+            
+            function setupAutocomplete(input) {
+                input.addEventListener('input', function() {
+                    const value = this.value.toLowerCase();
+                    
+                    if (value.length < 2) return;
+                    
+                    // In a real implementation, this would show a dropdown with filtered results
+                    // For this demo, we're just setting a placeholder value
+                    if (value === 'lon') {
+                        this.value = 'London (LHR)';
+                    } else if (value === 'par') {
+                        this.value = 'Paris (CDG)';
+                    } else if (value === 'fra') {
+                        this.value = 'Frankfurt (FRA)';
+                    } else if (value === 'ams') {
+                        this.value = 'Amsterdam (AMS)';
+                    }
+                });
+            }
+            
+            setupAutocomplete(fromInput);
+            setupAutocomplete(toInput);
+        });
+    </script>
+    <script id="dateValidationScript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const departureDate = document.getElementById('departure_date');
+            const returnDate = document.getElementById('return_date');
+            
+            // Set min date to today
+            const today = new Date();
+            const formattedToday = today.toISOString().split('T')[0];
+            departureDate.setAttribute('min', formattedToday);
+            returnDate.setAttribute('min', formattedToday);
+            
+            // Set default values
+            departureDate.value = formattedToday;
+            
+            // Set return date to tomorrow by default
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const formattedTomorrow = tomorrow.toISOString().split('T')[0];
+            returnDate.value = formattedTomorrow;
+            
+            // Ensure return date is after departure date
+            departureDate.addEventListener('change', function() {
+                if (returnDate.value < departureDate.value) {
+                    returnDate.value = departureDate.value;
+                }
+                returnDate.setAttribute('min', departureDate.value);
+            });
+        });
+    </script>
+</body>
+</html>

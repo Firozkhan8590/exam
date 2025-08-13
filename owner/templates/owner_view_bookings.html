@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Owner - User Bookings</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 90%;
+            margin: auto;
+            border-collapse: collapse;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-bookings {
+            text-align: center;
+            font-size: 18px;
+            color: #777;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Bookings for Your Flights</h2>
+
+    {% if booking %}
+    <table>
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Email</th>
+                <th>Flight Number</th>
+                <th>Departure</th>
+                <th>Arrival</th>
+                <th>Booking Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in booking %}
+            <tr>
+                <td>{{ b.user.username }}</td>
+                <td>{{ b.user.email }}</td>
+                <td>{{ b.flight.flight_number }}</td>
+                <td>{{ b.flight.departure_airport }}</td>
+                <td>{{ b.flight.arrival_airport }}</td>
+                <td>{{ b.booking_date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-bookings">No bookings found for your flights yet.</p>
+    {% endif %}
+
+</body>
+</html>
