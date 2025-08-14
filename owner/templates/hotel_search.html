@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aerotrack Hotels - Luxury Stays Redefined</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+       
+        body {
+            font-family: 'Inter', sans-serif;
+            @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.8) 0%, rgba(79, 70, 229, 0.8) 100%), 
+                        url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+        }
+        .search-card {
+            @apply bg-white dark:bg-gray-800 rounded-2xl shadow-xl;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .hotel-card {
+            @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-2;
+        }
+        .floating-label {
+            @apply absolute left-3 top-3 text-gray-500 dark:text-gray-400 transition-all duration-200 pointer-events-none;
+        }
+        .form-input:focus ~ .floating-label,
+        .form-input:not(:placeholder-shown) ~ .floating-label {
+            @apply -top-3 left-2 text-xs bg-white dark:bg-gray-800 px-1 text-blue-600 dark:text-blue-400;
+        }
+        .price-range::-webkit-slider-thumb {
+            @apply appearance-none w-5 h-5 bg-blue-600 dark:bg-blue-400 rounded-full cursor-pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <a class="navbar-brand text-2xl font-bold flex items-center" href="#">
+                <span class="bg-blue-600 text-white p-2 rounded-lg mr-2">AT</span>
+                <span class="text-blue-600 dark:text-blue-400">Aerotrack</span> Hotels
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="bi bi-list text-2xl"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto flex items-center space-x-1">
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" href="#">Deals</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" href="#" role="button" data-bs-toggle="dropdown">
+                            Destinations
+                        </a>
+                        <ul class="dropdown-menu shadow-lg border-0 dark:bg-gray-800">
+                            <li><a class="dropdown-item dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" href="#">Europe</a></li>
+                            <li><a class="dropdown-item dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" href="#">Asia</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" href="#">View All</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <button id="darkModeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 ml-2">
+                            <i class="bi bi-moon-fill dark:hidden"></i>
+                            <i class="bi bi-sun hidden dark:block"></i>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="btn btn-primary ms-3 px-4 py-2 rounded-full font-medium">
+                            <i class="bi bi-person me-2"></i> Sign In
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+  <header class="hero-gradient min-h-[500px] flex items-center justify-center text-white relative">
+    <!-- Video Modal - Now with site-themed background -->
+    <div id="videoModal" class="fixed inset-0 z-50 flex items-center justify-center hidden backdrop-blur-sm">
+        <div class="absolute inset-0 bg-white/10"></div> <!-- Semi-transparent site overlay -->
+        <div class="relative w-full max-w-4xl px-4">
+            <button id="closeVideo" class="absolute -top-12 right-0 text-black hover:text-blue-300 text-3xl transition-all hover:scale-110">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="bg-gradient-to-br from-blue-900/80 to-indigo-900/80 rounded-xl p-1 shadow-2xl">
+                <div class="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden">
+                    <iframe id="ytVideo" class="w-full h-[300px] sm:h-[400px] md:h-[500px]" 
+                            src=""
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Content (unchanged) -->
+    <div class="container mx-auto px-4 text-center relative z-10">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 animate-float">
+            Luxury Stays, <span class="text-blue-300">Unforgettable</span> Experiences
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
+            Discover handpicked hotels with premium amenities and exceptional service for your perfect getaway.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+            <a href="#hotel-search" class="btn btn-primary btn-lg px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-blue-700 transition">
+                <i class="bi bi-search me-2"></i> Explore Hotels
+            </a>
+            <button id="watchVideoBtn" class="btn btn-outline-light btn-lg px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition">
+                <i class="bi bi-play-circle me-2"></i> Watch Video
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Same JavaScript as before
+        document.addEventListener('DOMContentLoaded', () => {
+            const videoModal = document.getElementById('videoModal');
+            const watchBtn = document.getElementById('watchVideoBtn');
+            const closeBtn = document.getElementById('closeVideo');
+            const ytVideo = document.getElementById('ytVideo');
+            
+            const youtubeId = 'qemqQHaeCYo';
+            
+            watchBtn.addEventListener('click', () => {
+                ytVideo.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`;
+                videoModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            closeBtn.addEventListener('click', () => {
+                ytVideo.src = '';
+                videoModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+            
+            videoModal.addEventListener('click', (e) => {
+                if(e.target === videoModal) {
+                    ytVideo.src = '';
+                    videoModal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+    </script>
+</header>
+
+    <!-- Search Section -->
+    <section id="hotel-search" class="py-16 bg-gray-100 dark:bg-gray-800 relative">
+        <div class="container mx-auto px-4 -mt-20">
+            <div class="search-card p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-center mb-8">
+                    <span class="text-blue-600 dark:text-blue-400">Where</span> would you like to stay?
+                </h2>
+                
+               <form method="POST" action="{% url 'hotel_search' user.id %}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    {% csrf_token %}
+    
+    <!-- Destination -->
+    <div class="relative">
+        <input type="text" id="destination" name="destination" required class="form-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 peer" placeholder=" " />
+        <label for="destination" class="floating-label">Destination</label>
+        <i class="bi bi-geo-alt absolute right-3 top-3.5 text-gray-400"></i>
+    </div>
+
+    <!-- Check-in -->
+    <div class="relative">
+        <input type="date" id="checkInDate" name="check_in" required class="form-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 peer" />
+        <label for="checkInDate" class="floating-label">Check-in</label>
+        <i class="bi bi-calendar3 absolute right-3 top-3.5 text-gray-400"></i>
+    </div>
+
+    <!-- Check-out -->
+    <div class="relative">
+        <input type="date" id="checkOutDate" name="check_out" required class="form-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 peer" />
+        <label for="checkOutDate" class="floating-label">Check-out</label>
+        <i class="bi bi-calendar3 absolute right-3 top-3.5 text-gray-400"></i>
+    </div>
+
+    <!-- Rooms -->
+    <div class="relative">
+        <select id="rooms" name="rooms" class="form-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 appearance-none">
+            <option value="1">1 Room</option>
+            <option value="2">2 Rooms</option>
+            <option value="3">3 Rooms</option>
+            <option value="4">4+ Rooms</option>
+        </select>
+        <label for="rooms" class="floating-label">Rooms</label>
+        <i class="bi bi-door-open absolute right-3 top-3.5 text-gray-400"></i>
+    </div>
+
+    <!-- Adults -->
+    <div class="relative">
+        <select id="adults" name="adults" class="form-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 appearance-none">
+            <option value="1">1 Adult</option>
+            <option value="2" selected>2 Adults</option>
+            <option value="3">3 Adults</option>
+            <option value="4">4 Adults</option>
+            <option value="5">5+ Adults</option>
+        </select>
+        <label for="adults" class="floating-label">Adults</label>
+        <i class="bi bi-person absolute right-3 top-3.5 text-gray-400"></i>
+    </div>
+
+    <!-- Children -->
+    <div class="relative">
+        <select id="children" name="children" class="form-input w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 appearance-none">
+            <option value="0" selected>0 Children</option>
+            <option value="1">1 Child</option>
+            <option value="2">2 Children</option>
+            <option value="3">3 Children</option>
+            <option value="4">4+ Children</option>
+        </select>
+        <label for="children" class="floating-label">Children</label>
+        <i class="bi bi-person-plus absolute right-3 top-3.5 text-gray-400"></i>
+    </div>
+
+    <!-- Submit -->
+    <div class="lg:col-span-4 flex justify-center mt-4">
+        <button type="submit" class="btn btn-primary btn-lg px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-blue-700 transition duration-300 w-full max-w-md">
+            <i class="bi bi-search me-2"></i> Search Hotels
+        </button>
+    </div>
+</form>
+
+                <!-- Quick Filters -->
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- Hotel Listings -->
+    <section class="py-16 bg-white dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <!-- Filters -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <div>
+                    <h2 class="text-3xl font-bold">Featured Hotels</h2>
+                    <p class="text-gray-600 dark:text-gray-400">Based on your search preferences</p>
+                </div>
+                
+                <div class="flex flex-wrap gap-3 w-full md:w-auto">
+                    <form method="get" id="sortForm">
+                    <select name="sort" onchange="document.getElementById('sortForm').submit();" class="bg-gray-100 dark:bg-gray-800 border-0 rounded-lg px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-blue-500">
+                        <option value="">Sort By: Recommended</option>
+                        <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price (Low to High)</option>
+                        <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price (High to Low)</option>
+                        
+                    </select>
+                    </form>
+
+                    
+                    <button class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                        <i class="bi bi-funnel"></i> Filters
+                    </button>
+                    
+                    <!-- Price Range Filter (Hidden by default) -->
+                    <div class="hidden w-full md:w-64 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+                        <h4 class="font-medium mb-3">Price Range</h4>
+                        <input type="range" min="50" max="1000" value="500" class="w-full price-range my-2">
+                        <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                            <span>$50</span>
+                            <span>$1000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hotel Grid -->
+             <h2 class="text-xl font-semibold mb-4">All Hotels</h2>
+
+ {% if hotels %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
+            {% for hotel in hotels %}
+            <div class="hotel-card bg-white dark:bg-gray-800 rounded-3xl overflow-hidden">
+                <div class="relative">
+                    {% if hotel.image %}
+                        <img src="{{ hotel.image.url }}" alt="{{ hotel.hotel_name }}" class="w-full h-64 object-cover transform transition-transform duration-500 ease-in-out hover:scale-105">
+                    {% else %}
+                        <div class="w-full h-64 bg-gray-200 dark:bg-gray-700 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-xl font-medium">
+                            <i class="bi bi-building text-5xl mb-2"></i> No Image
+                        </div>
+                    {% endif %}
+
+
+                    
+
+                    <button class="absolute top-4 right-4 bg-white dark:bg-gray-700 p-3 rounded-full text-red-500 dark:text-red-400 shadow-md hover:bg-red-50 dark:hover:bg-gray-600 transition-all duration-300 wishlist-btn" data-hotel-id="{{ hotel.id }}">
+                        <i class="bi bi-heart text-xl heart-icon"></i>
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <div class="flex items-start justify-between mb-2">
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-50 leading-tight pr-2">{{ hotel.hotel_name }}</h3>
+                        <span class="modern-badge">Luxury</span>
+                    </div>
+
+                    <p class="text-gray-600 dark:text-gray-400 text-base mb-4 flex items-center">
+                        <i class="bi bi-geo-alt-fill text-blue-500 mr-2 text-xl"></i> {{ hotel.city }}, {{ hotel.state }}
+                    </p>
+
+                    {% with room=hotel.rooms.first %}
+                    {% if room %}
+                    <div class="mb-3">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Room Type: <strong>{{ room.room_type.name }}</strong></p>
+                        <div class="flex flex-wrap gap-2 mt-1">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Facility:
+                            {% for amenity in room.amenities.all %}
+                                <strong><span class="amenity-tag">{{ amenity.name }}</span></strong>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-5 border-t border-gray-100 dark:border-gray-700 mt-auto">
+                        <div>
+                            <div class="text-gray-500 dark:text-gray-400 text-sm line-through mb-0.5">₹{{ room.price_per_night|add:"250"|floatformat:0 }}</div>
+                            <span class="text-3xl sm:text-4xl font-extrabold text-blue-600 dark:text-blue-400 leading-none">₹{{ hotel.min_price|floatformat:0 }}</span>
+                            <span class="text-gray-500 dark:text-gray-400 text-base ml-1">/night</span>
+                        </div>
+                        
+                    </div>
+                    {% else %}
+                    <p class="text-gray-400 italic text-sm">No rooms available</p>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center text-xl sm:text-2xl mt-10 text-gray-600 dark:text-gray-300 font-medium py-12 px-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+            No hotels found in "<span class="text-blue-500 dark:text-blue-400 font-bold">{{ search.destination|title }}</span>". Please try a different destination.
+        </p>
+        {% endif %}
+
+
+
+
+                
+            
+            <!-- Load More Button -->
+            <div class="text-center mt-12">
+                <button class="btn btn-outline-primary px-8 py-3 rounded-full font-medium hover:bg-blue-600 hover:text-white transition">
+                    Load More Hotels <i class="bi bi-arrow-down ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+   
+
+    <!-- Newsletter -->
+    
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Column 1 -->
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4 flex items-center">
+                        <span class="bg-blue-600 text-white p-2 rounded-lg mr-2">AT</span>
+                        Aerotrack Hotels
+                    </h3>
+                    <p class="mb-4">
+                        Luxury redefined. Experience the world's finest hotels with our curated collection.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="bi bi-facebook text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="bi bi-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="bi bi-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="bi bi-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Column 2 -->
+               <div>
+    <h3 class="text-white text-lg font-bold mb-4">Explore</h3>
+    <ul class="space-y-2">
+        <li><a href="https://www.lonelyplanet.com/" target="_blank" class="hover:text-white transition">Destinations</a></li>
+        <li><a href="https://www.expedia.com/Deals" target="_blank" class="hover:text-white transition">Deals & Packages</a></li>
+        <li><a href="https://www.luxuryescapes.com/in" target="_blank" class="hover:text-white transition">Luxury Resorts</a></li>
+        <li><a href="https://www.marriott.com/" target="_blank" class="hover:text-white transition">Business Hotels</a></li>
+        <li><a href="https://www.tripadvisor.com/Travel_Guide" target="_blank" class="hover:text-white transition">Travel Guides</a></li>
+    </ul>
+</div>
+
+                
+                <!-- Column 3 -->
+                <div>
+                    <h3 class="text-white text-lg font-bold mb-4">Company</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'about' %}" class="hover:text-white transition">About Us</a></li>
+                        
+                        <li><a href="{% url 'user_landing' user.id %}" class="hover:text-white transition">home</a></li>
+                        
+                    </ul>
+                </div>
+                
+                <!-- Column 4 -->
+                 <div>
+            <h3 class="text-lg font-bold mb-6">Contact Info</h3>
+            <ul class="space-y-3">
+              <li class="flex items-start">
+                <div
+                  class="w-5 h-5 flex items-center justify-center text-gray-400 mr-3 mt-1"
+                >
+                  <i class="ri-map-pin-line"></i>
+                </div>
+                <span class="text-gray-400"
+                  >AeroTrack Technologies Pvt. Ltd.
+                  Technopark Campus,
+                  Thiruvananthapuram - 695581,
+                  Kerala, India
+                  </span
+                >
+              </li>
+              <li class="flex items-start">
+                <div
+                  class="w-5 h-5 flex items-center justify-center text-gray-400 mr-3 mt-1"
+                >
+                  <i class="ri-phone-line"></i>
+                </div>
+                <span class="text-gray-400">+91 8590219012</span>
+              </li>
+              <li class="flex items-start">
+                <div
+                  class="w-5 h-5 flex items-center justify-center text-gray-400 mr-3 mt-1"
+                >
+                  <i class="ri-mail-line"></i>
+                </div>
+                <span class="text-gray-400">info@aerotrack.com</span>
+              </li>
+            </ul>
+            
+          </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center">
+                <p>&copy; 2025 Aerotrack Hotels. All rights reserved.</p>
+                <p class="text-sm mt-2">Made with <i class="bi bi-heart-fill text-red-500"></i> for travelers worldwide</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" id="backToTop" class="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition hidden">
+        <i class="bi bi-arrow-up"></i>
+    </a>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Dark Mode Toggle
+        document.getElementById('darkModeToggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+        });
+        
+        // Check for saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark');
+        }
+        
+        // Back to Top Button
+        window.addEventListener('scroll', () => {
+            const backToTop = document.getElementById('backToTop');
+            if (window.scrollY > 300) {
+                backToTop.classList.remove('hidden');
+            } else {
+                backToTop.classList.add('hidden');
+            }
+        });
+        
+        // Simulate loading for demo
+        document.querySelector('form').addEventListener('submit', (e) => {
+            
+            const listings = document.querySelector('#hotel-listings .grid');
+            listings.innerHTML = `
+                <div class="col-span-3 flex justify-center items-center py-12">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                        <p>Finding the best hotels for you...</p>
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                alert('Hotels loaded! (This is a demo - in a real app, hotels would populate here)');
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

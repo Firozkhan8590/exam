@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Bookings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen p-6">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+        <h1 class="text-3xl font-bold text-gray-800">Manage Bookings</h1>
+        <a href="{% url 'hoteldashboard' hotels.id %}" 
+           class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition duration-200">
+            <span class="text-lg">←</span> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Booking Table -->
+    <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-blue-50 text-gray-700">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Guest Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Room Type</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Hotel</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Check-in</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Check-out</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Payment</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+                {% for booking in bookings %}
+                <tr class="hover:bg-gray-50 transition duration-200">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        {% for guest in booking.guest.all %}
+                            <p class="font-medium text-gray-900">{{ guest.full_name }}</p>
+                        {% empty %}
+                            <span class="text-gray-400 text-sm">No Guest</span>
+                        {% endfor %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ booking.room.room_type.name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ booking.hotel.hotel_name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ booking.check_in }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ booking.check_out }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">₹{{ booking.total_amount }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span class="inline-block px-2 py-1 rounded-full text-xs font-bold 
+                            {% if booking.payment_status == 'Paid' %}
+                                bg-green-100 text-green-700
+                            {% elif booking.payment_status == 'Failed' %}
+                                bg-red-100 text-red-700
+                            {% else %}
+                                bg-yellow-100 text-yellow-700
+                            {% endif %}
+                        ">
+                            {{ booking.payment_status }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center px-6 py-4 text-gray-500">No bookings found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

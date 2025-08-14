@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Owner Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#3b82f6',secondary:'#64748b'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .status-on-time {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        .status-delayed {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        .status-completed {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+        .notification-high {
+            border-left: 3px solid #ef4444;
+        }
+        .notification-medium {
+            border-left: 3px solid #f59e0b;
+        }
+        .notification-low {
+            border-left: 3px solid #10b981;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
+        <div class="px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="text-2xl font-['Pacifico'] text-primary">aerotrack</span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="#" class="border-primary text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Dashboard
+                        </a>
+                        <a href="{% url 'viewflight' user.id %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Flights
+                        </a>
+                        <a href="{% url 'viewaircraft' user.id %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Aircraft
+                        </a>
+                        <a href="{% url 'owner_view_bookings' user.id %}" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Bookings
+                        </a>
+                        <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Reports
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <button type="button" class="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none">
+                        <div class="w-6 h-6 flex items-center justify-center">
+                            <i class="ri-notification-3-line"></i>
+                        </div>
+                        <span class="absolute top-3 right-3 inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-semibold leading-none bg-red-500 text-white">3</span>
+                    </button>
+
+                    <div class="ml-3 relative">
+                        <div>
+                            <button type="button" class="flex text-sm rounded-full focus:outline-none" id="user-menu-button">
+                                <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+                                    <i class="ri-user-line"></i>
+                                </div>
+                            </button>
+                        </div>
+                        <div id="user-dropdown" class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                            <a href="{% url 'flightlogout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none" id="mobile-menu-button">
+                        <div class="w-6 h-6 flex items-center justify-center">
+                            <i class="ri-menu-line"></i>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sm:hidden hidden" id="mobile-menu">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="#" class="bg-primary bg-opacity-10 text-primary block pl-3 pr-4 py-2 border-l-4 border-primary text-base font-medium">
+                    Dashboard
+                </a>
+                <a href="#" class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                    Flights
+                </a>
+                <a href="{% url 'viewaircraft' user.id %}" class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                    Aircraft
+                </a>
+                <a href="#" class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                    Bookings
+                </a>
+                <a href="#" class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                    Reports
+                </a>
+            </div>
+            <div class="pt-4 pb-3 border-t border-gray-200">
+                <div class="flex items-center px-4">
+                    <div class="flex-shrink-0">
+                        <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+                            <i class="ri-user-line"></i>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <div class="text-base font-medium text-gray-800">Jonathan Parker</div>
+                        <div class="text-sm font-medium text-gray-500">jonathan.parker@skyfleet.com</div>
+                    </div>
+                </div>
+                <div class="mt-3 space-y-1">
+                    <a href="#" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+                        Your Profile
+                    </a>
+                    <a href="#" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+                        Settings
+                    </a>
+                    <a href="#" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+                        Sign out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Dashboard Header -->
+            <div class="md:flex md:items-center md:justify-between mb-8">
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-2xl font-semibold text-gray-900">Flight Dashboard</h1>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Welcome back, {{user.Companyname}}. Here's what's happening with your fleet today.
+                    </p>
+                </div>
+                <div class="mt-4 flex md:mt-0 md:ml-4">
+                    <span class="hidden sm:block">
+                        <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-button shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none whitespace-nowrap">
+                            <div class="w-4 h-4 mr-2 flex items-center justify-center">
+                                <i class="ri-download-line"></i>
+                            </div>
+                            Export
+                        </button>
+                    </span>
+                    <span class="ml-3">
+                        <a href="{% url 'add_flight' user.id %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-button shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none whitespace-nowrap">
+                            <div class="w-4 h-4 mr-2 flex items-center justify-center">
+                                <i class="ri-add-line"></i>
+                            </div>
+                            New Flight
+
+                        </a>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Dashboard Summary Cards -->
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+                <!-- Total Aircraft Card -->
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-blue-500 bg-opacity-10 rounded-full p-3">
+                                <div class="w-6 h-6 flex items-center justify-center text-primary">
+                                    <i class="ri-plane-line"></i>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Aircraft</dt>
+                                    <dd>
+                                        <div class="text-lg font-semibold text-gray-900">{{ aircrafts.count }}</div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-5 py-3">
+                        <div class="text-sm">
+                            <a href="#" class="font-medium text-primary hover:text-primary/80">View all</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Flights Card -->
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-green-500 bg-opacity-10 rounded-full p-3">
+                                <div class="w-6 h-6 flex items-center justify-center text-green-600">
+                                    <i class="ri-flight-takeoff-line"></i>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Active Flights</dt>
+                                    <dd>
+                                        <div class="text-lg font-semibold text-gray-900">{{active_flight.count}}</div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-5 py-3">
+                        <div class="text-sm">
+                            <a href="#" class="font-medium text-primary hover:text-primary/80">View all</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Bookings Card -->
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-purple-500 bg-opacity-10 rounded-full p-3">
+                                <div class="w-6 h-6 flex items-center justify-center text-purple-600">
+                                    <i class="ri-calendar-check-line"></i>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Bookings</dt>
+                                    <dd>
+                                        <div class="text-lg font-semibold text-gray-900">{{totalbookings}}</div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-5 py-3">
+                        <div class="text-sm">
+                            <a href="#" class="font-medium text-primary hover:text-primary/80">View all</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue Card -->
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-amber-500 bg-opacity-10 rounded-full p-3">
+                                <div class="w-6 h-6 flex items-center justify-center text-amber-600">
+                                    <i class="ri-line-chart-line"></i>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Revenue (Monthly)</dt>
+                                    <dd>
+                                        <div class="text-lg font-semibold text-gray-900">$3.2M</div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-5 py-3">
+                        <div class="text-sm">
+                            <a href="#" class="font-medium text-primary hover:text-primary/80">View report</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Flights Table Section -->
+            <div class="bg-white shadow rounded-lg mb-8">
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Flights</h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">Details of your most recent flight operations.</p>
+    </div>
+    <div class="overflow-x-auto">
+        <div x-data="{ open: false, selectedFlight: null, flightNumber: '' }">
+
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Flight ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aircraft</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrival</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for flight in recent_flights %}
+                <tr>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ flight.flight_number }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">{{ flight.departure_airport }} → {{ flight.arrival_airport }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">{{ flight.aircraft_type.model }}</td>
+                    <td class="px-6 py-4">
+                    <span class="
+                        inline-block px-2 py-1 text-xs font-semibold rounded-full
+                        {% if flight.status == 'scheduled' %}
+                            bg-green-100 text-green-800
+                        {% elif flight.status == 'delayed' %}
+                            bg-yellow-100 text-yellow-800
+                        {% elif flight.status == 'cancelled' %}
+                            bg-red-100 text-red-800
+                        {% else %}
+                            bg-gray-100 text-gray-800
+                        {% endif %}">
+                        {{ flight.status|title }}
+                    </span>
+                </td>
+
+                    <td class="px-6 py-4 text-sm text-gray-500">{{ flight.departure_time }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">{{ flight.arrival_time }}</td>
+                    <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
+  <div class="inline-flex space-x-2">
+    <button 
+      @click="selectedFlight = {{ flight.id }}; flightNumber = '{{ flight.flight_number }}'; open = true"
+      class="text-red-600 hover:underline">
+      Delete
+    </button>
+
+    <a href="{% url 'updateflight' user.id flight.id %}" class="text-blue-600 hover:underline">
+      Edit
+    </a>
+  </div>
+</td>
+
+
+                        
+                    
+                    
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="px-6 py-4 text-center text-sm text-red-500">No recent flights available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <template x-if="open">
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-96 relative">
+            <h2 class="text-center text-lg font-semibold text-gray-800 mb-4">Delete Flight</h2>
+            <p class="text-center text-gray-600 mb-6">
+                Are you sure you want to delete flight 
+                <strong x-text="flightNumber"></strong>?
+                This action cannot be undone.
+            </p>
+
+            <div class="flex justify-center space-x-3">
+                <button @click="open = false"
+                        class="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300">
+                    Cancel
+                </button>
+
+                <form :action="'/owner/delete_flight/{{ user.id }}/' + selectedFlight + '/'" method="post">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        Yes, Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</template>
+
+        </div>
+    </div>
+</div>
+
+            <!-- Aircraft Fleet Section -->
+            <div class="mb-8">
+                <div class="mb-5 flex items-center justify-between">
+                    <h2 class="text-lg font-medium text-gray-900">Aircraft Fleet</h2>
+                    <button class="text-sm font-medium text-primary hover:text-primary/80 flex items-center">
+                        View all fleet
+                        <div class="w-4 h-4 ml-1 flex items-center justify-center">
+                            <i class="ri-arrow-right-line"></i>
+                        </div>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <!-- Aircraft Card 1 -->
+                    <div class="bg-white shadow rounded-lg overflow-hidden">
+                        <div class="h-48 bg-gray-200 relative">
+                            <img src="https://readdy.ai/api/search-image?query=modern%20commercial%20airliner%20Boeing%20787%20Dreamliner%20on%20airport%20tarmac%2C%20professional%20aviation%20photography%2C%20clear%20blue%20sky%20background%2C%20high%20resolution%20detailed%20aircraft%20exterior&width=600&height=300&seq=1&orientation=landscape" alt="Boeing 787-9 Dreamliner" class="w-full h-full object-cover object-top">
+                            <div class="absolute top-3 right-3 bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                                Active
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-lg font-semibold text-gray-900">N78014</h3>
+                            <p class="text-gray-500 text-sm mb-4">Boeing 787-9 Dreamliner</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    Long-haul
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    296 seats
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    Premium
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm text-gray-500">
+                                    Next check: <span class="font-medium text-gray-900">Jul 15, 2025</span>
+                                </div>
+                                <button class="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80">
+                                    Details
+                                    <div class="w-4 h-4 ml-1 flex items-center justify-center">
+                                        <i class="ri-arrow-right-s-line"></i>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aircraft Card 2 -->
+                    <div class="bg-white shadow rounded-lg overflow-hidden">
+                        <div class="h-48 bg-gray-200 relative">
+                            <img src="https://readdy.ai/api/search-image?query=modern%20commercial%20airliner%20Airbus%20A350%20on%20airport%20tarmac%2C%20professional%20aviation%20photography%2C%20clear%20blue%20sky%20background%2C%20high%20resolution%20detailed%20aircraft%20exterior&width=600&height=300&seq=2&orientation=landscape" alt="Airbus A350-900" class="w-full h-full object-cover object-top">
+                            <div class="absolute top-3 right-3 bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                                Maintenance
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-lg font-semibold text-gray-900">N35782</h3>
+                            <p class="text-gray-500 text-sm mb-4">Airbus A350-900</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    Long-haul
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    325 seats
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    Premium
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm text-gray-500">
+                                    Maintenance until: <span class="font-medium text-gray-900">Jun 22, 2025</span>
+                                </div>
+                                <button class="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80">
+                                    Details
+                                    <div class="w-4 h-4 ml-1 flex items-center justify-center">
+                                        <i class="ri-arrow-right-s-line"></i>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aircraft Card 3 -->
+                    <div class="bg-white shadow rounded-lg overflow-hidden">
+                        <div class="h-48 bg-gray-200 relative">
+                            <img src="https://readdy.ai/api/search-image?query=modern%20commercial%20airliner%20Boeing%20777-300ER%20on%20airport%20tarmac%2C%20professional%20aviation%20photography%2C%20clear%20blue%20sky%20background%2C%20high%20resolution%20detailed%20aircraft%20exterior&width=600&height=300&seq=3&orientation=landscape" alt="Boeing 777-300ER" class="w-full h-full object-cover object-top">
+                            <div class="absolute top-3 right-3 bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                                Active
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-lg font-semibold text-gray-900">N45621</h3>
+                            <p class="text-gray-500 text-sm mb-4">Boeing 777-300ER</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    Long-haul
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    368 seats
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    Premium
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm text-gray-500">
+                                    Next check: <span class="font-medium text-gray-900">Aug 05, 2025</span>
+                                </div>
+                                <button class="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80">
+                                    Details
+                                    <div class="w-4 h-4 ml-1 flex items-center justify-center">
+                                        <i class="ri-arrow-right-s-line"></i>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Quick Actions & Notifications Section -->
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <!-- Quick Actions -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Quick Actions</h3>
+                        <p class="mt-1 max-w-2xl text-sm text-gray-500">Frequently used operations and tasks.</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <button class="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap">
+                                <div class="w-8 h-8 mb-3 flex items-center justify-center text-primary">
+                                    <i class="ri-flight-takeoff-line ri-lg"></i>
+                                </div>
+                                <span class="text-sm font-medium text-gray-900">Add New Flight</span>
+                            </button>
+                            <button class="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap">
+                                <div class="w-8 h-8 mb-3 flex items-center justify-center text-amber-600">
+                                    <i class="ri-tools-line ri-lg"></i>
+                                </div>
+                                <span class="text-sm font-medium text-gray-900">Schedule Maintenance</span>
+                            </button>
+                            <button class="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap">
+                                <div class="w-8 h-8 mb-3 flex items-center justify-center text-green-600">
+                                    <i class="ri-file-chart-line ri-lg"></i>
+                                </div>
+                                <span class="text-sm font-medium text-gray-900">Generate Report</span>
+                            </button>
+                            
+                            <a href="{% url 'aircraft' user.id %}" class="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap">
+                                
+                                <div class="w-8 h-8 mb-3 flex items-center justify-center text-purple-600">
+                                    <i class="ri-plane-line ri-lg"></i>
+                                </div>
+                                <span class="text-sm font-medium text-gray-900">Update Fleet</span>
+                            </a>
+                        </div>
+                        <div class="mt-6">
+                            <h4 class="text-sm font-medium text-gray-900 mb-3">Recent Tasks</h4>
+                            <ul class="space-y-3">
+                                <li class="bg-gray-50 p-3 rounded-md">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
+                                                <i class="ri-file-list-3-line"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">Flight Schedule Updated</p>
+                                                <p class="text-xs text-gray-500">Today at 9:42 AM</p>
+                                            </div>
+                                        </div>
+                                        <button class="text-gray-400 hover:text-gray-500">
+                                            <div class="w-5 h-5 flex items-center justify-center">
+                                                <i class="ri-more-2-fill"></i>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </li>
+                                <li class="bg-gray-50 p-3 rounded-md">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
+                                                <i class="ri-check-line"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">Maintenance Completed</p>
+                                                <p class="text-xs text-gray-500">Yesterday at 4:30 PM</p>
+                                            </div>
+                                        </div>
+                                        <button class="text-gray-400 hover:text-gray-500">
+                                            <div class="w-5 h-5 flex items-center justify-center">
+                                                <i class="ri-more-2-fill"></i>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="bg-white shadow rounded-lg">
+                    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg leading-6 font-medium text-gray-900">Notifications</h3>
+                                <p class="mt-1 max-w-2xl text-sm text-gray-500">Your recent alerts and updates.</p>
+                            </div>
+                            <button class="text-sm font-medium text-primary hover:text-primary/80">
+                                Mark all as read
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flow-root">
+                            <ul class="divide-y divide-gray-200">
+                                <li class="py-4 notification-high">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                                                <i class="ri-alert-line"></i>
+                                            </div>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-sm font-medium text-gray-900">
+                                                Maintenance Alert: N35782
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Hydraulic system inspection required before next flight.
+                                            </p>
+                                            <div class="mt-2 flex items-center text-xs text-gray-500">
+                                                <div class="w-3 h-3 flex items-center justify-center mr-1">
+                                                    <i class="ri-time-line"></i>
+                                                </div>
+                                                30 minutes ago
+                                            </div>
+                                        </div>
+                                        <div class="flex-shrink-0 self-center">
+                                            <button class="text-gray-400 hover:text-gray-500">
+                                                <div class="w-5 h-5 flex items-center justify-center">
+                                                    <i class="ri-more-2-fill"></i>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="py-4 notification-medium">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+                                                <i class="ri-flight-land-line"></i>
+                                            </div>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-sm font-medium text-gray-900">
+                                                Flight SF-1036 Delayed
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Paris to Dubai flight delayed by 45 minutes due to weather conditions.
+                                            </p>
+                                            <div class="mt-2 flex items-center text-xs text-gray-500">
+                                                <div class="w-3 h-3 flex items-center justify-center mr-1">
+                                                    <i class="ri-time-line"></i>
+                                                </div>
+                                                2 hours ago
+                                            </div>
+                                        </div>
+                                        <div class="flex-shrink-0 self-center">
+                                            <button class="text-gray-400 hover:text-gray-500">
+                                                <div class="w-5 h-5 flex items-center justify-center">
+                                                    <i class="ri-more-2-fill"></i>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="py-4 notification-low">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                                <i class="ri-check-double-line"></i>
+                                            </div>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-sm font-medium text-gray-900">
+                                                Maintenance Completed: N78014
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Routine maintenance for Boeing 787-9 completed successfully.
+                                            </p>
+                                            <div class="mt-2 flex items-center text-xs text-gray-500">
+                                                <div class="w-3 h-3 flex items-center justify-center mr-1">
+                                                    <i class="ri-time-line"></i>
+                                                </div>
+                                                Yesterday at 5:30 PM
+                                            </div>
+                                        </div>
+                                        <div class="flex-shrink-0 self-center">
+                                            <button class="text-gray-400 hover:text-gray-500">
+                                                <div class="w-5 h-5 flex items-center justify-center">
+                                                    <i class="ri-more-2-fill"></i>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="py-4 notification-medium">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                                <i class="ri-user-add-line"></i>
+                                            </div>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-sm font-medium text-gray-900">
+                                                New Crew Assignment
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Crew rotation updated for flights SF-1042 and SF-1045.
+                                            </p>
+                                            <div class="mt-2 flex items-center text-xs text-gray-500">
+                                                <div class="w-3 h-3 flex items-center justify-center mr-1">
+                                                    <i class="ri-time-line"></i>
+                                                </div>
+                                                Yesterday at 2:15 PM
+                                            </div>
+                                        </div>
+                                        <div class="flex-shrink-0 self-center">
+                                            <button class="text-gray-400 hover:text-gray-500">
+                                                <div class="w-5 h-5 flex items-center justify-center">
+                                                    <i class="ri-more-2-fill"></i>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="mt-6 text-center">
+                            <button class="text-sm font-medium text-primary hover:text-primary/80">
+                                View all notifications
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+
+
+    <script id="navigation-script">
+        document.addEventListener('DOMContentLoaded', function() {
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userDropdown = document.getElementById('user-dropdown');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            userMenuButton.addEventListener('click', function() {
+                userDropdown.classList.toggle('hidden');
+            });
+            document.addEventListener('click', function(event) {
+                if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                    userDropdown.classList.add('hidden');
+                }
+            });
+
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        });
+    </script>
+</body>
+</html>

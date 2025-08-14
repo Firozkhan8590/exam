@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ flights.aircraft_type.manufacturer }} {{ flights.aircraft_type.model }} Seating Layout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables for easier color management */
+        :root {
+            --primary-blue: #007bff; /* A vibrant blue for primary elements */
+            --light-blue-bg: #e0f2fe; /* Very light blue for subtle backgrounds */
+            --business-seat-bg: #ffe082; /* Soft gold for business class */
+            --business-seat-border: #ffca28; /* Slightly darker gold border */
+            --economy-seat-bg: #c8e6c9; /* Gentle green for economy class */
+            --economy-seat-border: #81c784; /* Slightly darker green border */
+            --emergency-exit-seat-bg: #ffab91; /* Orange for emergency exit */
+            --emergency-exit-seat-border: #ff7043; /* Darker orange for border */
+            --selected-seat-color: #34d399; /* Your existing vibrant green for selected */
+            --text-dark: #333;
+            --text-light: #666;
+            --bg-light-page: #f8f9fa; /* Light grey for the page background */
+            --border-subtle: #dee2e6; /* Light grey for borders */
+            --shadow-soft: rgba(0, 0, 0, 0.08); /* Soft shadow */
+            --shadow-medium: rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
+            --danger-red: #dc3545; /* For cancel buttons */
+            --danger-red-dark: #c82333;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light-page);
+            padding: 2.5rem;
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 100px; /* Important: Add padding to the bottom for the fixed bar */
+        }
+
+        .container {
+            max-width: 960px;
+            margin: auto;
+            background: white;
+            border-radius: 18px;
+            padding: 2.5rem 3.5rem;
+            box-shadow: 0 12px 30px var(--shadow-medium);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-blue);
+            margin-bottom: 0.8rem;
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--text-dark);
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        /* --- Aircraft Info Section (Left Text, Right Image) --- */
+        .aircraft-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-subtle);
+            flex-wrap: wrap;
+        }
+
+        .aircraft-info-text {
+            flex: 1;
+            min-width: 280px;
+            text-align: right;
+        }
+        .aircraft-info-text h2 {
+            margin-bottom: 0.5rem;
+        }
+        .aircraft-info-text p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-top: 0;
+        }
+
+        .aircraft-info-image {
+            flex-shrink: 0;
+            max-width: 40%;
+            text-align: left;
+        }
+
+        .aircraft-info img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px var(--shadow-soft);
+            transition: transform 0.3s ease;
+        }
+
+        .aircraft-info img:hover {
+            transform: scale(1.02);
+        }
+
+        /* Responsive adjustments for aircraft info */
+        @media (max-width: 768px) {
+            .aircraft-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+            }
+            .aircraft-info-text,
+            .aircraft-info-image {
+                text-align: center;
+                max-width: 100%;
+            }
+        }
+
+        /* New: Grouping for seat sections */
+        .seat-class-section {
+            margin-bottom: 2.5rem;
+            padding: 1.8rem 2rem;
+            border-radius: 14px;
+            background-color: var(--light-blue-bg);
+            box-shadow: 0 5px 15px var(--shadow-soft);
+        }
+        .seat-class-section h2 {
+            text-align: center;
+            color: var(--primary-blue);
+            margin-top: 0;
+            margin-bottom: 1.8rem;
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        .seat-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .seat {
+            width: 48px;
+            height: 48px;
+            margin: 0 3px;
+            background-color: #dbeafe;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .seat:hover {
+            transform: translateY(-2px);
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2), 0 3px 8px var(--shadow-soft);
+        }
+
+        /* Class-specific seat colors */
+        .business .seat {
+            background-color: var(--business-seat-bg);
+            border: 1px solid var(--business-seat-border);
+        }
+        .business .seat:hover {
+            background-color: var(--business-seat-border);
+            color: white;
+        }
+
+        .economy .seat {
+            background-color: var(--economy-seat-bg);
+            border: 1px solid var(--economy-seat-border);
+        }
+        .economy .seat:hover {
+            background-color: var(--economy-seat-border);
+            color: white;
+        }
+
+        /* New: Emergency Exit Seat Styling */
+        .emergency-exit .seat {
+            background-color: var(--emergency-exit-seat-bg);
+            border: 1px solid var(--emergency-exit-seat-border);
+            position: relative; /* For the icon */
+        }
+
+        .emergency-exit .seat:hover {
+            background-color: var(--emergency-exit-seat-border);
+            color: white;
+        }
+
+        /* Emergency Exit Icon (optional, but good for clarity) */
+        .emergency-exit .seat::after {
+            content: 'Ex'; /* Changed content for a more iconic look */
+            position: absolute;
+            top: -10px; /* Adjust as needed */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7em; /* Slightly smaller */
+            font-weight: 700;
+            color: var(--danger-red);
+            background-color: rgba(255, 255, 255, 0.9); /* Slightly less transparent */
+            padding: 2px 4px;
+            border-radius: 3px;
+            pointer-events: none; /* Make sure it doesn't interfere with clicks */
+            white-space: nowrap;
+            opacity: 0.9;
+            border: 1px solid rgba(255, 255, 255, 0.5); /* A subtle border */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+
+        .aisle {
+            width: 40px;
+            height: 48px;
+            background-color: transparent; /* Changed for a cleaner look */
+            position: relative;
+            margin: 0 10px;
+        }
+        .aisle::before {
+            /* Removed dotted line for a cleaner Ixigo-like aesthetic */
+            content: none;
+        }
+        /* If you still want a separator, consider a subtle background color or a very faint solid line */
+        /* .aisle { background-color: #f5f5f5; border-radius: 4px; } */
+
+
+        .seat.selected {
+            background-color: var(--selected-seat-color) !important;
+            color: white;
+            box-shadow: 0 0 12px rgba(52, 211, 153, 0.8);
+            border: 1px solid var(--selected-seat-color);
+            transform: scale(1.05);
+            animation: seatSelectedPulse 0.4s ease-out;
+        }
+
+        @keyframes seatSelectedPulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(52, 211, 153, 0.3); }
+            50% { transform: scale(1.08); box-shadow: 0 0 18px rgba(52, 211, 153, 0.9); }
+            100% { transform: scale(1.05); box-shadow: 0 0 12px rgba(52, 211, 153, 0.8); }
+        }
+
+        /* --- Legend Styling (now at top) --- */
+        .legend {
+            text-align: center;
+            margin-top: 1.5rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 1rem;
+            color: var(--text-light);
+            background-color: #f0f4f8;
+            border-radius: 10px;
+            padding-top: 1rem;
+        }
+
+        .legend p {
+            margin: 0;
+        }
+
+        .legend span {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            vertical-align: middle;
+            margin-right: 8px;
+            border-radius: 6px;
+            box-shadow: inset 0 0 3px rgba(0,0,0,0.15);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .legend .selected-swatch {
+             background-color: var(--selected-seat-color);
+             border: 1px solid var(--selected-seat-color);
+        }
+         .legend .emergency-exit-swatch {
+            background-color: var(--emergency-exit-seat-bg);
+            border: 1px solid var(--emergency-exit-seat-border);
+        }
+
+        /* --- Fixed Confirm Booking Bar --- */
+        .fixed-booking-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            padding: 1rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .fixed-booking-bar.active {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .booking-details {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+
+        .booking-details span strong {
+            color: var(--primary-blue);
+            font-size: 1.25rem;
+        }
+
+        /* Confirm Button Styling */
+        .confirm-button {
+            display: inline-block;
+            padding: 14px 35px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .confirm-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.5);
+        }
+
+        /* Responsive for fixed bar */
+        @media (max-width: 600px) {
+            .fixed-booking-bar {
+                flex-direction: column;
+                padding: 1rem 1.5rem;
+                align-items: center;
+            }
+            .booking-details {
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+            .confirm-button {
+                width: 100%;
+            }
+        }
+
+        /* --- Confirmation Message Box Styles --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Dark semi-transparent background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000; /* Higher than fixed bar */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .confirm-message-box {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 450px;
+            width: 90%; /* Responsive width */
+            transform: translateY(-20px); /* Start slightly above center */
+            transition: transform 0.3s ease-out;
+            animation: scaleIn 0.3s ease-out forwards; /* Scale in animation */
+        }
+
+        .modal-overlay.active .confirm-message-box {
+             transform: translateY(0); /* Move to center */
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9) translateY(-20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .confirm-message-box h3 {
+            font-size: 1.8rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .confirm-message-box p {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .confirm-message-box .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Space between buttons */
+        }
+
+        .confirm-message-box .button-group button {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .confirm-message-box .button-group .confirm-yes {
+            background-color: var(--selected-seat-color);
+            color: white;
+            border: 1px solid var(--selected-seat-color);
+        }
+        .confirm-message-box .button-group .confirm-yes:hover {
+            background-color: #28a745; /* Darker green */
+            box-shadow: 0 4px 10px rgba(52, 211, 153, 0.5);
+        }
+
+        .confirm-message-box .button-group .confirm-cancel {
+            background-color: transparent;
+            color: var(--danger-red);
+            border: 1px solid var(--danger-red);
+        }
+        .confirm-message-box .button-group .confirm-cancel:hover {
+            background-color: var(--danger-red);
+            color: white;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+        }
+        .seat.booked,
+        .seat.disabled {
+            background-color: #ccc !important;
+            cursor: not-allowed;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        #toast {
+            /* Added toast styles */
+            position: fixed;
+            bottom: 120px; /* Above the fixed booking bar */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 2001; /* Higher than modal overlay */
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out, bottom 0.4s ease-in-out;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            pointer-events: none; /* Allows clicks to pass through */
+            white-space: nowrap;
+        }
+        #toast.show {
+            opacity: 1;
+            bottom: 120px; /* Ensure it's in position */
+        }
+        /* If you're using regular CSS */
+        .seat.disabled:hover::after {
+            content: "Seat already booked";
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        .legend .booked-swatch {
+            background-color: #ccc;
+            border: 1px solid #999;
+        }
+
+
+        /* Responsive for confirmation box */
+        @media (max-width: 480px) {
+            .confirm-message-box {
+                padding: 1.5rem;
+            }
+            .confirm-message-box h3 {
+                font-size: 1.5rem;
+            }
+            .confirm-message-box p {
+                font-size: 1rem;
+            }
+            .confirm-message-box .button-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .confirm-message-box .button-group button {
+                width: 100%;
+            }
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <form id="bookingForm" method="POST" action="{% url 'bookingflight' user.id flights.id %}">
+    {% csrf_token %}
+    <input type="hidden" id="selected_seats_input" name="selected_seats" value="">
+    <input type="hidden" name="passengers" value="{{ searched_passengers }}">
+
+    <h1>Seating Layout</h1>
+
+    <div class="legend">
+    <p>
+        <span style="background-color:var(--business-seat-bg); border: 1px solid var(--business-seat-border);"></span> Business &nbsp;&nbsp;
+        <span style="background-color:var(--economy-seat-bg); border: 1px solid var(--economy-seat-border);"></span> Economy &nbsp;&nbsp;
+        <span class="emergency-exit-swatch"></span> Emergency Exit &nbsp;&nbsp;
+        <span class="selected-swatch"></span> Selected &nbsp;&nbsp;
+        <span class="booked-swatch"></span> Booked
+    </p>
+</div>
+
+
+    <div class="aircraft-info">
+        <div class="aircraft-info-text">
+            <h2>{{ flights.aircraft_type.manufacturer }} {{ flights.aircraft_type.model }}</h2>
+            <p>Registration: <strong>{{ flights.aircraft_type.registation_number }}</strong></p>
+        </div>
+        {% if flights.aircraft_type.aircraft_image %}
+            <div class="aircraft-info-image">
+                <img src="{{ flights.aircraft_type.aircraft_image.url }}" alt="Aircraft Image">
+            </div>
+        {% endif %}
+    </div>
+
+    {# --- Business Class Section --- #}
+    {% if business %}
+<div class="seat-class-section business">
+    <h2>Business Class</h2>
+    <div class="seat-rows-wrapper">
+        {% for row in business %}
+            <div class="seat-row">
+                {# Corrected logic: Check each 'seat' in 'booked_seats', not just 'row.0' #}
+                {% if config == '2-2' %}
+                    <div class="seat {% if row.0 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.0 }}" {% if row.0 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.0 }}</div>
+                    <div class="seat {% if row.1 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.1 }}" {% if row.1 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.1 }}</div>
+                    <div class="aisle"></div>
+                    <div class="seat {% if row.2 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.2 }}" {% if row.2 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.2 }}</div>
+                    <div class="seat {% if row.3 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.3 }}" {% if row.3 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.3 }}</div>
+                {% elif config == '3-3' or config == '3-4-3' %}
+                    <div class="seat {% if row.0 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.0 }}" {% if row.0 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.0 }}</div>
+                    <div class="seat {% if row.1 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.1 }}" {% if row.1 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.1 }}</div>
+                    <div class="seat {% if row.2 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.2 }}" {% if row.2 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.2 }}</div>
+                    <div class="aisle"></div>
+                    <div class="seat {% if row.3 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.3 }}" {% if row.3 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.3 }}</div>
+                    <div class="seat {% if row.4 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.4 }}" {% if row.4 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.4 }}</div>
+                    <div class="seat {% if row.5 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.5 }}" {% if row.5 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.5 }}</div>
+                {% else %}
+                    {% for seat in row %}
+                        {# This is the main correction for general case #}
+                        <div class="seat {% if seat in booked_seats %}disabled booked{% endif %}" data-seat="{{ seat }}" {% if seat in booked_seats %}title="Seat already booked"{% endif %}>{{ seat }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+
+
+    {# --- Economy Class Section --- #}
+   {% if economy %}
+<div class="seat-class-section economy">
+    <h2>Economy Class</h2>
+    <div class="seat-rows-wrapper">
+        {% for row in economy %}
+            <div class="seat-row {% if row.0|stringformat:"s"|slice:":2" == '15' or row.0|stringformat:"s"|slice:":2" == '28' %}emergency-exit{% endif %}">
+                {# Corrected logic: Check each 'seat' in 'booked_seats', not just 'row.0' #}
+                {% if config == '2-2' %}
+                    <div class="seat {% if row.0 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.0 }}" {% if row.0 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.0 }}</div>
+                    <div class="seat {% if row.1 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.1 }}" {% if row.1 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.1 }}</div>
+                    <div class="aisle"></div>
+                    <div class="seat {% if row.2 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.2 }}" {% if row.2 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.2 }}</div>
+                    <div class="seat {% if row.3 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.3 }}" {% if row.3 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.3 }}</div>
+                {% elif config == '3-3' %}
+                    <div class="seat {% if row.0 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.0 }}" {% if row.0 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.0 }}</div>
+                    <div class="seat {% if row.1 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.1 }}" {% if row.1 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.1 }}</div>
+                    <div class="seat {% if row.2 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.2 }}" {% if row.2 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.2 }}</div>
+                    <div class="aisle"></div>
+                    <div class="seat {% if row.3 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.3 }}" {% if row.3 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.3 }}</div>
+                    <div class="seat {% if row.4 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.4 }}" {% if row.4 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.4 }}</div>
+                    <div class="seat {% if row.5 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.5 }}" {% if row.5 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.5 }}</div>
+                {% elif config == '3-4-3' %}
+                    <div class="seat {% if row.0 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.0 }}" {% if row.0 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.0 }}</div>
+                    <div class="seat {% if row.1 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.1 }}" {% if row.1 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.1 }}</div>
+                    <div class="seat {% if row.2 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.2 }}" {% if row.2 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.2 }}</div>
+                    <div class="aisle"></div>
+                    <div class="seat {% if row.3 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.3 }}" {% if row.3 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.3 }}</div>
+                    <div class="seat {% if row.4 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.4 }}" {% if row.4 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.4 }}</div>
+                    <div class="seat {% if row.5 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.5 }}" {% if row.5 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.5 }}</div>
+                    <div class="seat {% if row.6 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.6 }}" {% if row.6 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.6 }}</div>
+                    <div class="aisle"></div>
+                    <div class="seat {% if row.7 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.7 }}" {% if row.7 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.7 }}</div>
+                    <div class="seat {% if row.8 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.8 }}" {% if row.8 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.8 }}</div>
+                    <div class="seat {% if row.9 in booked_seats %}disabled booked{% endif %}" data-seat="{{ row.9 }}" {% if row.9 in booked_seats %}title="Seat already booked"{% endif %}>{{ row.9 }}</div>
+                {% else %}
+                    {% for seat in row %}
+                        {# This is the main correction for general case #}
+                        <div class="seat {% if seat in booked_seats %}disabled booked{% endif %}" data-seat="{{ seat }}" {% if seat in booked_seats %}title="Seat already booked"{% endif %}>{{ seat }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+    <div style="text-align: center; margin-top: 20px; display: none;">
+        <button type="submit" class="confirm-button">
+            Confirm Booking
+        </button>
+    </div>
+
+</form>
+
+<div id="fixedBookingBar" class="fixed-booking-bar">
+    <div class="booking-details">
+        <span>Selected Seats: <strong id="selectedSeatsCount">0</strong></span>
+    </div>
+    <button type="button" id="openConfirmModal" class="confirm-button">
+        Confirm Booking
+    </button>
+</div>
+
+</div>
+<div id="confirmationModal" class="modal-overlay">
+    <div class="confirm-message-box">
+        <h3>Confirm Your Booking</h3>
+        <p>You have selected <span id="modalSelectedSeatsCount">0</span> seat(s). Do you want to proceed with the booking?</p>
+        <div class="button-group">
+            <button id="confirmYes" class="confirm-yes">Yes, Confirm</button>
+            <button id="confirmCancel" class="confirm-cancel">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedSeats = [];
+
+    const fixedBookingBar = document.getElementById('fixedBookingBar');
+    const selectedSeatsCountSpan = document.getElementById('selectedSeatsCount');
+    const openConfirmModalBtn = document.getElementById('openConfirmModal');
+    const confirmationModal = document.getElementById('confirmationModal');
+    const modalSelectedSeatsCountSpan = document.getElementById('modalSelectedSeatsCount');
+    const confirmYesBtn = document.getElementById('confirmYes');
+    const confirmCancelBtn = document.getElementById('confirmCancel');
+    const bookingForm = document.getElementById('bookingForm');
+
+    // Function to show toast messages
+    function showToast(message) {
+        let toast = document.getElementById('toast');
+        if (!toast) {
+            // Create toast element if it doesn't exist (should be in HTML but good fallback)
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            // Basic styles for toast - more advanced styles are in CSS
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 120px; /* Above the fixed booking bar */
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                z-index: 2001;
+                opacity: 0;
+                transition: opacity 0.4s ease-in-out, bottom 0.4s ease-in-out;
+                font-size: 0.9rem;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                pointer-events: none;
+                white-space: nowrap;
+            `;
+            document.body.appendChild(toast);
+        }
+
+        toast.textContent = message;
+        toast.classList.add('show');
+        toast.style.bottom = '120px'; // Set initial position when showing
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.style.bottom = '100px'; // Animate out slightly
+        }, 3000); // Hide after 3 seconds
+    }
+
+
+    document.querySelectorAll('.seat').forEach(seat => {
+        seat.addEventListener('click', function () {
+            if (this.classList.contains('booked') || this.classList.contains('disabled')) {
+                showToast("Seat already booked. Please choose another seat.");
+                return;
+            }
+
+            const seatCodeRaw = this.dataset.seat;
+            if (!seatCodeRaw) return;
+
+            const seatCode = seatCodeRaw.trim();
+
+            if (selectedSeats.includes(seatCode)) {
+                selectedSeats = selectedSeats.filter(s => s !== seatCode);
+                this.classList.remove('selected');
+            } else {
+                // Optional: Add a check here if you want to limit the number of selected seats
+                // For example, if passengers is a number:
+                const passengersCount = parseInt("{{ searched_passengers }}"); // Get count from Django context
+                if (selectedSeats.length >= passengersCount) {
+                    showToast(`You can only select ${passengersCount} seat(s).`);
+                    return; // Prevent selecting more seats
+                }
+                selectedSeats.push(seatCode.toUpperCase());
+                this.classList.add('selected');
+            }
+
+            const uniqueSeats = [...new Set(selectedSeats)]; // Ensure uniqueness just in case
+
+            document.getElementById('selected_seats_input').value = uniqueSeats.join(', ');
+            selectedSeatsCountSpan.textContent = uniqueSeats.length;
+            modalSelectedSeatsCountSpan.textContent = uniqueSeats.length;
+
+            fixedBookingBar.classList.toggle('active', uniqueSeats.length > 0);
+        });
+    });
+
+    openConfirmModalBtn.addEventListener('click', () => {
+        const passengersCount = parseInt("{{ searched_passengers }}");
+
+        if (selectedSeats.length === 0) {
+            showToast("Please select at least one seat to proceed."); // Using toast here
+            return;
+        }
+
+        // Added validation to match selected seats with passenger count
+        if (selectedSeats.length !== passengersCount) {
+            showToast(`You need to select exactly ${passengersCount} seat(s) for your booking.`);
+            return;
+        }
+
+        confirmationModal.classList.add('active');
+    });
+
+    confirmYesBtn.addEventListener('click', () => {
+        confirmationModal.classList.remove('active');
+        bookingForm.submit();
+    });
+
+    confirmCancelBtn.addEventListener('click', () => {
+        confirmationModal.classList.remove('active');
+    });
+
+    // Initial state check for fixed bar on page load
+    fixedBookingBar.classList.toggle('active', selectedSeats.length > 0);
+</script>
+
+<div id="toast"></div> 
+</body>
+
+</html>

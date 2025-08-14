@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Guest Info - Hotel Booking</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-center mb-8 text-blue-700">🛏️ Hotel Guest Details</h1>
+
+    <form method="post"  class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {% csrf_token %}
+
+      <!-- 👤 Guest Info Form -->
+      <div class="md:col-span-2 bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800">Guest Information</h2>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block font-medium">Full Name</label>
+            <input type="text" name="full_name" required class="w-full border border-gray-300 p-2 rounded">
+          </div>
+
+          <div>
+            <label class="block font-medium">Gender</label>
+            <select name="gender" required class="w-full border border-gray-300 p-2 rounded">
+              <option value="">Select Gender</option>
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+              <option value="O">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-medium">Email</label>
+            <input type="email" name="email" required class="w-full border border-gray-300 p-2 rounded">
+          </div>
+
+          <div>
+            <label class="block font-medium">Phone</label>
+            <input type="text" name="phone" required class="w-full border border-gray-300 p-2 rounded">
+          </div>
+
+          <div>
+            <label class="block font-medium">Address</label>
+            <input type="text" name="address" class="w-full border border-gray-300 p-2 rounded">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block font-medium">Check-in Date</label>
+              <input type="date" name="check_in" required class="w-full border border-gray-300 p-2 rounded">
+            </div>
+            <div>
+              <label class="block font-medium">Check-out Date</label>
+              <input type="date" name="check_out" required class="w-full border border-gray-300 p-2 rounded">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 💰 Booking Summary -->
+      <div class="bg-gray-50 p-6 rounded-lg shadow h-fit flex flex-col justify-between">
+        <div>
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">Booking Summary</h2>
+          <table class="table-auto w-full text-sm">
+            <tbody>
+              <tr>
+                <td class="font-medium text-gray-700 py-2">Room Type:</td>
+                <td class="text-right text-gray-800 py-2">{{ room.room_type }}</td>
+              </tr>
+              <tr>
+                <td class="font-medium text-gray-700 py-2">Price/Night:</td>
+                <td class="text-right text-gray-800 py-2">₹{{ room.price_per_night }}</td>
+              </tr>
+              {% if total_amount %}
+              <tr class="border-t border-gray-300">
+                <td class="font-bold text-lg text-green-700 py-2">Total Amount:</td>
+                <td class="text-right font-bold text-lg text-green-700 py-2">₹{{ total_amount }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="2" class="text-gray-500 py-2">Total will be shown after date selection.</td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 🔘 Proceed Button -->
+        <div class="mt-6 text-center">
+          <button type="submit" class="w-full bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+            Proceed to Payment
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>

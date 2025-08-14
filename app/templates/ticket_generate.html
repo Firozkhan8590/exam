@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Boarding Passes</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .ticket-container {
+            width: 800px; /* Standard ticket width */
+            min-height: 450px;
+            background: linear-gradient(135deg, #fdfdfd 0%, #edf2f7 100%);
+            border-radius: 1.5rem; /* More pronounced rounded corners */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+            overflow: hidden; /* Important for the pseudo-elements */
+            position: relative;
+            margin: 2rem auto; /* Center the ticket and add space */
+            border: 1px solid #e2e8f0;
+            page-break-after: always; /* Force a page break after each ticket when printing */
+        }
+        /* Override page-break-after for the last ticket to prevent an empty page */
+        .ticket-container:last-of-type {
+            page-break-after: avoid;
+        }
+
+        /* Perforated Line Effect */
+        .ticket-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 70%; /* Adjust to control tear-off point */
+            width: 2px;
+            background: repeating-linear-gradient(to bottom, #d1d5db, #d1d5db 5px, transparent 5px, transparent 10px);
+            z-index: 10;
+        }
+
+        /* Circular cut-outs for the perforated line (visual only) */
+        .ticket-container::after {
+            content: '';
+            position: absolute;
+            top: -10px; /* Half of circle height */
+            bottom: -10px; /* Half of circle height */
+            left: 70%;
+            width: 20px;
+            background-color: #f0f2f5; /* Match body background */
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 0 10px #f0f2f5; /* Blends circles with background */
+        }
+
+        .ticket-main, .ticket-stub {
+            padding: 2.5rem;
+            float: left;
+            box-sizing: border-box;
+            height: 100%;
+        }
+
+        .ticket-main {
+            width: 70%;
+            border-right: 1px solid #e2e8f0; /* Soft separator */
+        }
+
+        .ticket-stub {
+            width: 30%;
+            background-color: #f9fafb; /* Slightly different background for stub */
+            border-left: 1px dashed #d1d5db; /* Dashed line for tear-off */
+        }
+
+        @media print {
+            body {
+                background-color: #fff;
+            }
+            .ticket-container {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                margin: 0.5cm auto; /* Adjust margin for print to provide some border */
+            }
+            /* Remove circular cut-outs for print */
+            .ticket-container::after {
+                display: none;
+            }
+            /* Make dashed line solid for print */
+            .ticket-container::before {
+                 background: #d1d5db;
+                 width: 1px;
+            }
+            /* Ensure no unwanted page margins */
+            @page {
+                margin: 0.5cm; /* Adjust as needed for your printer/layout */
+            }
+        }
+    </style>
+</head>
+<body class="print:m-0 print:p-0">
+
+    {% for passenger in passengers %}
+        <div class="ticket-container">
+            <div class="ticket-main">
+                <div class="flex justify-between items-center mb-6">
+                    <img src="https://via.placeholder.com/100x40/00008B/FFFFFF?text=AIRLINE+LOGO" alt="Airline Logo" class="h-10">
+                    <h1 class="text-3xl font-bold text-gray-800 tracking-tight">BOARDING PASS</h1>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 mb-8">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-medium">Passenger Name</p>
+                        <p class="text-lg font-semibold text-gray-900">{{ passenger.firstname }} {{ passenger.lastname }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-medium">Flight No.</p>
+                        <p class="text-lg font-semibold text-gray-900">{{ flights.flight_number }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-medium">Booking ID</p>
+                        <p class="text-lg font-semibold text-gray-900">{{ booking.id }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 mb-8">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-medium">From</p>
+                        <p class="text-2xl font-extrabold text-blue-700">{{ flights.departure_airport }}</p>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-medium">To</p>
+                        <p class="text-2xl font-extrabold text-blue-700">{{ flights.arrival_airport }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 mb-8">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-medium">Departure Time</p>
+                        <p class="text-xl font-bold text-gray-900">{{ flights.departure_time }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-medium">Gate</p>
+                        <p class="text-2xl font-extrabold text-indigo-700">A12</p> </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-medium">Seat</p>
+                        <p class="text-2xl font-extrabold text-indigo-700">
+                            {{ passenger.seat_number|default:'N/A' }} {# This correctly accesses the dynamically assigned seat #}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-medium">Arrival Time</p>
+                        <p class="text-lg font-semibold text-gray-900">{{ flights.arrival_time }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-medium">Class</p>
+                        <p class="text-lg font-semibold text-gray-900">
+                            {# If you have logic to determine class per passenger, use it here #}
+                            {# Otherwise, you might display the overall booking class or "Economy" as default #}
+                            {% if booking.business_count > 0 and forloop.counter <= booking.business_count %}
+                                Business {# Very basic guess based on passenger order and business count #}
+                            {% else %}
+                                Economy
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-medium">Terminal</p>
+                        <p class="text-lg font-semibold text-gray-900">T1</p> </div>
+                </div>
+
+                <p class="mt-8 text-sm text-gray-600">
+                    Please arrive at the airport at least 2 hours before your scheduled departure time for domestic flights, and 3 hours for international flights. Have your valid ID and this boarding pass ready.
+                </p>
+            </div>
+
+            <div class="ticket-stub relative flex flex-col justify-between items-center py-6">
+                <div class="mb-4 text-center">
+                    <p class="text-xs text-gray-500 uppercase font-medium">Flight</p>
+                    <p class="text-xl font-bold text-gray-900">{{ flights.flight_number }}</p>
+                </div>
+                <div class="mb-4 text-center">
+                    <p class="text-xs text-gray-500 uppercase font-medium">Date</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ flights.departure_time|date:"M d, Y" }}</p>
+                </div>
+                 <div class="mb-4 text-center">
+                    <p class="text-xs text-gray-500 uppercase font-medium">Seat</p>
+                    <p class="text-xl font-bold text-blue-700">
+                        {{ passenger.seat_number|default:'N/A' }} {# Accessing the dynamically assigned seat #}
+                    </p>
+                </div>
+                <div class="text-center">
+                    <p class="text-xs text-gray-500 uppercase font-medium">Passenger</p>
+                    <p class="text-sm font-semibold text-gray-900">{{ passenger.firstname|upper }}, {{ passenger.lastname}}</p>
+                </div>
+
+                <div class="mt-auto">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=BOOKID:{{ booking.id }}%0AFLT:{{ flights.flight_number }}%0APAX:{{ passenger.email }}%0ASEAT:{{ passenger.seat_number|default:'N/A' }}" alt="QR Code" class="w-32 h-32 mx-auto">
+                </div>
+                <p class="text-xs text-gray-500 mt-2 text-center font-mono">Scan for boarding</p>
+              
+
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="mt-6 text-center print:hidden">
+    <a href="{% url 'generate_pdf' user.id flights.id booking.id %}"
+       class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-green-600 hover:bg-green-700 transition">
+       📄 Download PDF
+    </a>
+    <a href="{% url 'user_landing' user.id %}" 
+   class="mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded shadow">
+   🏠 Go to Homepage
+</a>
+
+</div>
+    
+
+
+    <div class="mt-8 text-center text-gray-500 text-sm print:hidden">
+        Please print all boarding passes for your journey.
+    </div>
+
+</body>
+</html>

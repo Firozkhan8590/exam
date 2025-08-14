@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About AeroTrack</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9f9f9;
+    }
+    .hero-section {
+      background: linear-gradient(to right, #007bff, #00c6ff);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .section {
+      padding: 60px 20px;
+    }
+    .highlight {
+      font-weight: 600;
+      color: #007bff;
+    }
+    .btn-back {
+      margin-top: 40px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <h1>About AeroTrack</h1>
+    <p>Your ultimate travel companion for flights and trains.</p>
+  </div>
+
+  <!-- What is AeroTrack -->
+  <section class="section container">
+    <h2 class="mb-4">What is AeroTrack?</h2>
+    <p>AeroTrack is a smart travel platform designed to make your journey smooth, simple, and stress-free. From booking tickets to tracking your flights or trains in real-time, AeroTrack is your one-stop destination for all things travel.</p>
+  </section>
+
+  <!-- How It Helps You -->
+  <section class="section bg-light">
+    <div class="container">
+      <h2 class="mb-4">Why People Love AeroTrack</h2>
+      <ul class="list-unstyled">
+        <li><span class="highlight">✔ Easy Booking:</span> Book flights or trains in just a few clicks.</li>
+        <li><span class="highlight">✔ Live Tracking:</span> Stay updated with real-time arrival and delay info.</li>
+        <li><span class="highlight">✔ Smart Planning:</span> Compare schedules and fares before you book.</li>
+        <li><span class="highlight">✔ All-in-One Dashboard:</span> View your bookings and manage trips easily.</li>
+        <li><span class="highlight">✔ 24/7 Support:</span> We're always here to assist with your travel needs.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section container">
+    <h2 class="mb-4">How It Works</h2>
+    <p>Once you land on AeroTrack, you can explore destinations, book tickets, and monitor travel updates without any confusion. Our system keeps your trip organized from start to finish. Whether you’re heading home or planning a vacation, AeroTrack gives you confidence every step of the way.</p>
+  </section>
+
+  <!-- Back to Home Button -->
+  <div class="text-center">
+    <a href="{% url 'landing_page' %}" class="btn btn-primary btn-back">← Back to Home</a>
+  </div>
+
+  <br><br>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

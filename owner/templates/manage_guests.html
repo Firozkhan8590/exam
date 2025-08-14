@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Guests</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+
+  <div class="max-w-7xl mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6 text-center text-indigo-700">Manage Guests</h1>
+
+    <!-- Search Form -->
+    <form method="POST" class="flex justify-end mb-4">
+      {% csrf_token %}
+      <input
+        type="text"
+        name="search"
+        placeholder="Search guests..."
+        value="{{ search_query|default:'' }}"
+        class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+      <button type="submit" class="ml-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Search</button>
+    </form>
+
+    <!-- Guest Table -->
+    <div class="bg-white shadow rounded-lg overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-indigo-600 text-white">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Guest Name</th>
+            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Gender</th>
+            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Email</th>
+            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Phone</th>
+            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Check-In</th>
+            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Check-Out</th>
+            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for guest in guests %}
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-6 py-4 whitespace-nowrap font-medium">{{ guest.full_name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ guest.gender }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ guest.email }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ guest.phone }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ guest.booking.check_in }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ guest.booking.check_out }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              {% if guest.booking.payment_status == "Paid" %}
+                <span class="px-3 py-1 inline-flex text-sm rounded-full bg-green-100 text-green-800">Paid</span>
+              {% else %}
+                <span class="px-3 py-1 inline-flex text-sm rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              
+              <a href="{% url 'delete_bookings' hotel.id guest.booking.id %}" class="text-red-600 hover:underline text-sm">Delete</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="px-6 py-4 text-center text-gray-500">No guests found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</body>
+</html>

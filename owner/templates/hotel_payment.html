@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hotel Room Payment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+  <div class="min-h-screen flex items-center justify-center px-4">
+    <div class="bg-white shadow-xl rounded-2xl max-w-2xl w-full p-8">
+
+      <h2 class="text-2xl font-bold text-blue-700 text-center mb-6">🧾 Hotel Booking Payment</h2>
+
+      <!-- Room & Hotel Info -->
+      <div class="mb-6 border-b pb-4 space-y-2">
+        <p class="text-lg"><span class="font-medium text-gray-700">Room:</span> {{ room.room_type.name }}</p>
+        <p class="text-lg"><span class="font-medium text-gray-700">Hotel:</span> {{ room.hotel.hotel_name }}</p>
+        <p class="text-lg"><span class="font-medium text-gray-700">Price/Night:</span> ₹{{ room.price_per_night }}</p>
+        <p class="text-lg font-semibold text-green-700 mt-2">Total to Pay: ₹{{ booking.total_amount }}</p>
+
+        <!-- ✅ Payment Status -->
+        <p class="text-lg mt-2">
+          <span class="font-medium text-gray-700">Status:</span>
+          {% if booking.payment_status == "Paid" %}
+            <span class="text-green-600 font-semibold">Paid ✅</span>
+          {% elif booking.payment_status == "Pending" %}
+            <span class="text-yellow-600 font-semibold">Pending ⏳</span>
+          {% else %}
+            <span class="text-red-600 font-semibold">{{ booking.payment_status }}</span>
+          {% endif %}
+        </p>
+      </div>
+
+      <!-- Pay Now Button -->
+      <div class="flex justify-center">
+        <button id="pay-btn" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
+          Pay Now with Razorpay
+        </button>
+      </div>
+
+      <!-- Hidden Payment Form -->
+      <form action="{% url 'payment_success' %}" method="POST" id="payment-form">
+        {% csrf_token %}
+        <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+        <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+        <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+        <input type="hidden" name="room_id" value="{{ room.id }}">
+        <input type="hidden" name="booking_id" value="{{ booking.id }}"> 
+        <input type="hidden" name="user_id" value="{{ user.id }}">
+
+      </form>
+
+      <p class="text-sm text-gray-500 text-center mt-4">Secure payment powered by Razorpay 🔒</p>
+    </div>
+  </div>
+
+  <!-- Razorpay Script -->
+  <script>
+    var options = {
+      "key": "{{ razorpay_key }}",
+      "amount": "{{ amount }}",
+      "currency": "INR",
+      "name": "Hotel Booking",
+      "description": "Payment for your room booking",
+      "order_id": "{{ order_id }}",
+      "prefill": {
+        "name": "{{ booking.guest.first.full_name|default:'' }}",
+        "email": "{{ booking.guest.first.email|default:'' }}",
+        "contact": "{{ booking.guest.first.phone|default:'' }}"
+      },
+      "theme": {
+        "color": "#4F46E5"
+      },
+      "handler": function (response) {
+        document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+        document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+        document.getElementById('razorpay_signature').value = response.razorpay_signature;
+
+        // Submit the form via JavaScript
+        document.getElementById('payment-form').submit();
+
+        // 🚨 Redirect after short delay using booking ID
+        const bookingId = document.querySelector('input[name="booking_id"]').value;
+          // Redirect after payment
+        }
+
+    };
+
+    var rzp = new Razorpay(options);
+    document.getElementById('pay-btn').onclick = function (e) {
+      rzp.open();
+      e.preventDefault();
+    };
+  </script>
+
+</body>
+</html>

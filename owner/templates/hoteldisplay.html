@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hotel Results</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+  <div class="container mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold text-center mb-6">
+      Hotels in {{ city }} ({{ checkin }} to {{ checkout }})
+    </h1>
+
+    {% if hotels %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for hotel in hotels %}
+      <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
+        <!-- Image -->
+        <div class="h-48 w-full bg-gray-200">
+          {% with hotel.hotel.media.0.uri as image_url %}
+          {% if image_url %}
+          <img src="{{ image_url }}" alt="Hotel Image" class="w-full h-full object-cover" />
+          {% else %}
+          <img src="https://via.placeholder.com/400x300?text=No+Image" alt="No image"
+            class="w-full h-full object-cover" />
+          {% endif %}
+          {% endwith %}
+        </div>
+
+        <!-- Info -->
+        <div class="p-4">
+          <h2 class="text-lg font-semibold mb-1">{{ hotel.hotel.name }}</h2>
+          <p class="text-sm text-gray-600 mb-2">
+            {{ hotel.hotel.address.lines.0|default:"" }}, {{ hotel.hotel.address.cityName|default:"" }}
+          </p>
+
+          <!-- Amenities -->
+          {% if hotel.hotel.amenities %}
+          <p class="text-xs text-gray-500 mb-2 truncate">
+            Amenities: {{ hotel.hotel.amenities|join:", " }}
+          </p>
+          {% endif %}
+
+          <!-- Price -->
+          {% if hotel.offers.0.price.total %}
+          <p class="text-blue-600 font-semibold text-lg mb-3">
+            ₹{{ hotel.offers.0.price.total }} / night
+          </p>
+          {% endif %}
+
+          <a href="#" class="block text-center bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+            Book Now
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center text-gray-500 mt-10">No hotels found for this search.</p>
+    {% if error %}
+    <br><span class="text-red-500">Error: {{ error }}</span>
+    {% endif %}
+    {% endif %}
+  </div>
+
+</body>
+
+</html>
